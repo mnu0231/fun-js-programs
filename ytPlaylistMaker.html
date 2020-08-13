@@ -11,7 +11,8 @@
         box-sizing: border-box;
       }
       header {
-        width: 100vw;
+        margin-top: 0px;
+        width: 100%;
         padding: 10px;
         border: 1px solid black;
         text-align: center;
@@ -22,6 +23,13 @@
       input {
         width: 100%;
         border: 1px solid black;
+      }
+      button {
+        border: 1px solid black;
+      }
+      button:hover {
+        cursor: pointer;
+        border: 1px solid gold;
       }
       .pushBox {
         width: 100%;
@@ -38,7 +46,7 @@
         box-shadow: inset 0px 0px 3px 2px lightgray;
       } 
       #shell {
-        width: 100vw;
+        width: 100%;
         height: 315px;
         border: 1px solid black;
         display: flex;
@@ -72,9 +80,23 @@
         overflow: scroll;
       }
       #instructions {
-        width: 100vw;
+        width: 100%;
         border: 1px solid black;
         padding: 10px;
+      }
+      @media screen and (min-width: 700px) {
+        header {
+          width: 700px;
+          margin: 25px auto 0px auto;
+        }
+        main {
+          width: 700px;
+          margin: 0px auto;
+        }
+        footer {
+          width: 700px;
+          margin: 0px auto 25px auto;
+        }
       }
     </style>
   </head>
@@ -90,7 +112,7 @@
           </div>
           <div id="nav">
             <div id="submissions">
-              <input>
+              <input placeholder="URLs here">
               <div id="submitResetDIV">
                 <button id="submit">Submit</button>
                 <button id="reset">Reset</button>
@@ -111,10 +133,12 @@
       <section>
         <div id="instructions">
           <h2>Instructions</h2>
-          <p>Simply add a comma separated list of YouTube video URLs to the text box, and press the <b>Submit</b> button to have an easily navigated playlist produced. You can also preserve your playlist by pressing the <b>Save</b> button, which uploads a JSON file to your browser's local storage. That same JSON file can then be later accessed by pressing the <b>Load</b> button.</p>
+          <p>Add a comma separated list of YouTube video URLs to the text box, and press the <b>Submit</b> button to have your playlist produced. You can also preserve your playlist by pressing the <b>Save</b> button, which uploads a JSON file to your browser's local storage. That same JSON file can then be later accessed by pressing the <b>Load</b> button.</p>
         </div>
       </section>
     </main>
+    <footer>
+    </footer>
     <script>
       function main() {
         let bod = document.querySelector("body");
@@ -131,43 +155,59 @@
         let tracker = [];
         let id = 0;
         function squeeze(e){
-          if (e.includes("https://www.youtube.com/") || e.includes("https://youtu.be/")) {
+          if ((e.includes("https://www.youtube.com/") || e.includes("https://youtu.be/")) && (e.trim().indexOf("https://www.youtube.com/") == 0 || e.trim().indexOf("https://youtu.be/") == 0)) {
             if (e.includes("v=")) {
               let data = e.split("");
-              let a = data.indexOf("v");
-              let revisedData;
-              if (data.includes("&")) {
-                let b = data.indexOf("&");
-                revisedData = data.slice(a + 2,b);
+              if (data.indexOf("v") + 1 == data.indexOf("=")) {
+                let a = data.indexOf("v");
+                let revisedData;
+                if (data.includes("&")) {
+                  let b = data.indexOf("&");
+                  revisedData = data.slice(a + 2,b);
+                } else {
+                  revisedData = data.slice(a + 2);
+                }
+                if (revisedData.length <= 12) {
+                  return revisedData.join("");
+                } else {
+                  return false;
+                }
               } else {
-                revisedData = data.slice(a + 2);
+                return false;
               }
-              return revisedData.join("");
             } else if (e.includes(".be/")) {
               let data = e.split("");
-              let a = data.indexOf("/");
-              let revisedData;
-              if (data.includes("?")) {
-                let b = data.indexOf("?");
-                revisedData = data.slice(a + 11,b);
+              if (e.indexOf(".be") + 2 == e.indexOf("e/")) {
+                let a = data.indexOf("/");
+                let revisedData;
+                if (data.includes("?")) {
+                  let b = data.indexOf("?");
+                  revisedData = data.slice(a + 11,b);
+                } else {
+                  revisedData = data.slice(a + 11);
+                }
+                if (revisedData.length <= 12) {
+                  return revisedData.join("");
+                } else {
+                  return false;
+                }
               } else {
-                revisedData = data.slice(a + 11);
+                return false;
               }
-              return revisedData.join("");
             } else {
-              return "No known YouTube ID."
+              return false;
             }
           } else {
-            return "No known YouTube ID.";
+            return false;
           }
         }
         submitButton.addEventListener("click",function(){
           let userInput = inputField.value.split(",");
           for (let i = 0; i < userInput.length; i++) {
-            if (userInput[i].value != "" && userInput[i].includes("https://") && !userInput[i].includes("playlist")) {
+            if (userInput[i] !== "" && !userInput[i].includes("playlist") && !userInput[i].includes("search_query") && !userInput[i].includes("results") && Boolean(squeeze(userInput[i])) == true) {
               let pushBox = document.createElement("div");
               if (controls.children.length == 0) {
-                videoBox.src = `https://www.youtube.com/embed/${squeeze(userInput[0])}`;
+                videoBox.src = `https://www.youtube.com/embed/${squeeze(userInput[i])}`;
                 pushBox.style.border = "1px solid gold";
               }
               pushBox.classList.add("pushBox");
@@ -214,14 +254,14 @@
         save.addEventListener("click",function(){
           let zeURLs = [];
           let conCh = controls.children;
-          for (let c of conCh) {
-            zeURLs.push(c.textContent);
+          if (conCh.length > 0) {
+            for (let c of conCh) {
+              zeURLs.push(c.textContent);
+            }
+            localStorage.setItem("ids",JSON.stringify(zeURLs));
           }
-          localStorage.setItem("ids",JSON.stringify(zeURLs));
         });
         load.addEventListener("click",function(){
-          let data = localStorage.getItem("ids");
-          let dataOpened = JSON.parse(data);
           function resetting(){
             controls.innerHTML = "";
             videoBox.src = `https://www.youtube.com/embed/`;
@@ -230,6 +270,8 @@
             id = 0;
           }
           resetting();
+          let data = localStorage.getItem("ids");
+          let dataOpened = JSON.parse(data);
           for (let i = 0; i < dataOpened.length; i++) {
             let pushBox = document.createElement("div");
             if (controls.children.length == 0) {
