@@ -1,0 +1,281 @@
+<!doctype HTML>
+<html>
+  <head>
+    <title>YT Playlist Maker</title>
+    <style>
+      * {
+        padding: 0px;
+        border: none;
+        margin: 0px;
+        font-family: sans-serif;
+        box-sizing: border-box;
+      }
+      input {
+        width: 100%;
+        border: 1px solid black;
+      }
+      .pushBox {
+        width: 100%;
+        height: 44px;
+        border: 1px solid black;
+        font-size: 8px;
+        text-shadow: 1px 1px white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .pushBox:hover {
+        cursor: pointer;
+        box-shadow: inset 0px 0px 3px 2px lightgray;
+      } 
+      #shell {
+        width: 100vw;
+        height: 315px;
+        border: 1px solid black;
+        display: flex;
+      }
+      #frame {
+        width: 100%;
+        height: 315px;
+        border: 1px solid black;
+      }
+      #nav {
+        width: 100px;
+        height: 315px;
+        border: 1px solid black;
+      }
+      #submissions {
+        height: 90px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        border: 1px solid black;
+      }
+      #loadSaveDIV, #submitResetDIV, #prevNextDIV {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+      }
+      #controls {
+        height: 224px;
+        overflow: scroll;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="shell">
+      <div id="frame">
+        <iframe width="100%" height="314" src="https://www.youtube.com/embed/" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div id="nav">
+        <div id="submissions">
+          <input>
+          <div id="submitResetDIV">
+            <button id="submit">Submit</button>
+            <button id="reset">Reset</button>
+          </div>
+          <div id="loadSaveDIV">
+            <button id="save">Save</button>
+            <button id="load">Load</button>
+          </div>
+          <div id="prevNextDIV">
+            <button id="previous">Prev</button>
+            <button id="next">Next</button>
+          </div>
+        </div>
+        <div id="controls"></div>
+      </div>
+    </div>
+    <script>
+      function main() {
+        let bod = document.querySelector("body");
+        let frame = document.querySelector("#frame");
+        let videoBox = document.querySelector("#frame iframe");
+        let inputField = document.querySelector("#submissions input")
+        let submitButton = document.querySelector("#submit")
+        let reset = document.querySelector("#reset");
+        let save = document.querySelector("#save");
+        let load = document.querySelector("#load");
+        let prev = document.querySelector("#previous");
+        let next = document.querySelector("#next");
+        let controls = document.querySelector("#controls");
+        let tracker = [];
+        let id = 0;
+        function squeeze(e){
+          if (e.includes("https://www.youtube.com/") || e.includes("https://youtu.be/")) {
+            if (e.includes("v=")) {
+              let data = e.split("");
+              let a = data.indexOf("v");
+              let revisedData;
+              if (data.includes("&")) {
+                let b = data.indexOf("&");
+                revisedData = data.slice(a + 2,b);
+              } else {
+                revisedData = data.slice(a + 2);
+              }
+              return revisedData.join("");
+            } else if (e.includes(".be/")) {
+              let data = e.split("");
+              let a = data.indexOf("/");
+              let revisedData;
+              if (data.includes("?")) {
+                let b = data.indexOf("?");
+                revisedData = data.slice(a + 11,b);
+              } else {
+                revisedData = data.slice(a + 11);
+              }
+              return revisedData.join("");
+            } else {
+              return "No known YouTube ID."
+            }
+          } else {
+            return "No known YouTube ID.";
+          }
+        }
+        submitButton.addEventListener("click",function(){
+          if (inputField.value != "" && inputField.value.includes("https://") && !inputField.value.includes("playlist")) {
+            let userInput = inputField.value.split(",");
+            for (let i = 0; i < userInput.length; i++) {
+              let pushBox = document.createElement("div");
+              if (controls.children.length == 0) {
+                videoBox.src = `https://www.youtube.com/embed/${squeeze(userInput[0])}`;
+                pushBox.style.border = "1px solid gold";
+              }
+              pushBox.classList.add("pushBox");
+              let rN1 = Math.floor(Math.random() * 256);
+              let rN2 = Math.floor(Math.random() * 256);
+              let rN3 = Math.floor(Math.random() * 256);
+              pushBox.style.backgroundColor = "rgb(" + rN1 + "," + rN2 + "," + rN3 + ")";
+              let tempP = document.createElement("p");
+              let tempTextNode = document.createTextNode(squeeze(userInput[i]));
+              tempP.appendChild(tempTextNode);
+              pushBox.appendChild(tempP);
+              controls.appendChild(pushBox);
+              if (tracker.length == 0) {
+                tracker.push({active:true,pushBox:id.toString(),yT:squeeze(userInput[i])});
+              } else {
+                tracker.push({active:false,pushBox:id.toString(),yT:squeeze(userInput[i])});
+              }
+              pushBox.id = (id++).toString();
+              pushBox.addEventListener("click",function(){
+                videoBox.src = `https://www.youtube.com/embed/${tempP.innerHTML}`;
+                let ch = controls.children;
+                for (let c of ch) {
+                  c.style.border = "1px solid black";
+                }
+                for (let t of tracker) {
+                  if (t.pushBox == pushBox.id) {
+                    pushBox.style.border = "1px solid gold";
+                    t.active = true;
+                  } else {
+                    t.active = false;
+                  }
+                }
+              });
+            }
+          }
+        });
+        reset.addEventListener("click",function(){
+          controls.innerHTML = "";
+          videoBox.src = `https://www.youtube.com/embed/`;
+          inputField.value = "";
+          tracker = [];
+          id = 0;
+        });
+        save.addEventListener("click",function(){
+          let zeURLs = [];
+          let conCh = controls.children;
+          for (let c of conCh) {
+            zeURLs.push(c.textContent);
+          }
+          localStorage.setItem("ids",JSON.stringify(zeURLs));
+        });
+        load.addEventListener("click",function(){
+          let data = localStorage.getItem("ids");
+          let dataOpened = JSON.parse(data);
+          function resetting(){
+            controls.innerHTML = "";
+            videoBox.src = `https://www.youtube.com/embed/`;
+            inputField.value = "";
+            tracker = [];
+            id = 0;
+          }
+          resetting();
+          for (let i = 0; i < dataOpened.length; i++) {
+            let pushBox = document.createElement("div");
+            if (controls.children.length == 0) {
+              videoBox.src = `https://www.youtube.com/embed/${dataOpened[i]}`;
+              pushBox.style.border = "1px solid gold";
+            }
+            pushBox.classList.add("pushBox");
+            let rN1 = Math.floor(Math.random() * 256);
+            let rN2 = Math.floor(Math.random() * 256);
+            let rN3 = Math.floor(Math.random() * 256);
+            pushBox.style.backgroundColor = "rgb(" + rN1 + "," + rN2 + "," + rN3 + ")";
+            let tempP = document.createElement("p");
+            let tempTextNode = document.createTextNode(dataOpened[i]);
+            tempP.appendChild(tempTextNode);
+            pushBox.appendChild(tempP);
+            controls.appendChild(pushBox);
+            if (tracker.length == 0) {
+              tracker.push({active:true,pushBox:id.toString(),yT:dataOpened[i]});
+            } else {
+              tracker.push({active:false,pushBox:id.toString(),yT:dataOpened[i]});
+            }
+            pushBox.id = (id++).toString();
+            pushBox.addEventListener("click",function(){
+              videoBox.src = `https://www.youtube.com/embed/${tempP.textContent}`;
+              let ch = controls.children;
+              for (let c of ch) {
+                c.style.border = "1px solid black";
+              }
+              for (let t of tracker) {
+                if (t.pushBox == pushBox.id) {
+                  pushBox.style.border = "1px solid gold";
+                  t.active = true;
+                } else {
+                  t.active = false;
+                }
+              }
+            });
+          }
+        });
+        prev.addEventListener("click",function(){
+          let active;
+          for (let i = 0; i < tracker.length; i++) {
+            if (tracker[i].active) {
+              active = Number(tracker[i].pushBox);
+            }
+          }
+          if (active > 0) {
+            videoBox.src = `https://www.youtube.com/embed/${tracker[active - 1].yT}`;
+            let children = controls.children;
+            children[active].style.border = "1px solid black";
+            tracker[active].active = false;
+            children[active - 1].style.border = "1px solid gold";
+            tracker[active - 1].active = true;
+          }
+        });
+        next.addEventListener("click",function(){
+          let active;
+          for (let i = 0; i < tracker.length; i++) {
+            if (tracker[i].active) {
+              active = Number(tracker[i].pushBox);
+            }
+          }
+          if (active < tracker.length) {
+            videoBox.src = `https://www.youtube.com/embed/${tracker[active + 1].yT}`;
+            let children = controls.children;
+            children[active].style.border = "1px solid black";
+            tracker[active].active = false;
+            children[active + 1].style.border = "1px solid gold";
+            tracker[active + 1].active = true;
+          }
+        });
+      }
+      main();
+    </script>
+  </body>
+</html>
