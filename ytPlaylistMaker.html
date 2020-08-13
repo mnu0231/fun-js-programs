@@ -10,6 +10,15 @@
         font-family: sans-serif;
         box-sizing: border-box;
       }
+      header {
+        width: 100vw;
+        padding: 10px;
+        border: 1px solid black;
+        text-align: center;
+      }
+      h2 {
+        margin-bottom: 5px;
+      }
       input {
         width: 100%;
         border: 1px solid black;
@@ -62,32 +71,50 @@
         height: 224px;
         overflow: scroll;
       }
+      #instructions {
+        width: 100vw;
+        border: 1px solid black;
+        padding: 10px;
+      }
     </style>
   </head>
   <body>
-    <div id="shell">
-      <div id="frame">
-        <iframe width="100%" height="314" src="https://www.youtube.com/embed/" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      </div>
-      <div id="nav">
-        <div id="submissions">
-          <input>
-          <div id="submitResetDIV">
-            <button id="submit">Submit</button>
-            <button id="reset">Reset</button>
+    <header>
+      <h1>YouTube Playlist Maker</h1>
+    </header>
+    <main>
+      <section>
+        <div id="shell">
+          <div id="frame">
+            <iframe width="100%" height="314" src="https://www.youtube.com/embed/" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
           </div>
-          <div id="loadSaveDIV">
-            <button id="save">Save</button>
-            <button id="load">Load</button>
-          </div>
-          <div id="prevNextDIV">
-            <button id="previous">Prev</button>
-            <button id="next">Next</button>
+          <div id="nav">
+            <div id="submissions">
+              <input>
+              <div id="submitResetDIV">
+                <button id="submit">Submit</button>
+                <button id="reset">Reset</button>
+              </div>
+              <div id="loadSaveDIV">
+                <button id="save">Save</button>
+                <button id="load">Load</button>
+              </div>
+              <div id="prevNextDIV">
+                <button id="previous">Prev</button>
+                <button id="next">Next</button>
+              </div>
+            </div>
+            <div id="controls"></div>
           </div>
         </div>
-        <div id="controls"></div>
-      </div>
-    </div>
+      </section>
+      <section>
+        <div id="instructions">
+          <h2>Instructions</h2>
+          <p>Simply add a comma separated list of YouTube video URLs to the text box, and press the <b>Submit</b> button to have an easily navigated playlist produced. You can also preserve your playlist by pressing the <b>Save</b> button, which uploads a JSON file to your browser's local storage. That same JSON file can then be later accessed by pressing the <b>Load</b> button.</p>
+        </div>
+      </section>
+    </main>
     <script>
       function main() {
         let bod = document.querySelector("body");
@@ -135,9 +162,9 @@
           }
         }
         submitButton.addEventListener("click",function(){
-          if (inputField.value != "" && inputField.value.includes("https://") && !inputField.value.includes("playlist")) {
-            let userInput = inputField.value.split(",");
-            for (let i = 0; i < userInput.length; i++) {
+          let userInput = inputField.value.split(",");
+          for (let i = 0; i < userInput.length; i++) {
+            if (userInput[i].value != "" && userInput[i].includes("https://") && !userInput[i].includes("playlist")) {
               let pushBox = document.createElement("div");
               if (controls.children.length == 0) {
                 videoBox.src = `https://www.youtube.com/embed/${squeeze(userInput[0])}`;
