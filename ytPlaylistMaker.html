@@ -1,7 +1,7 @@
 <!doctype HTML>
 <html>
   <head>
-    <title>YT Playlist Maker</title>
+    <title>YouTube Playlist Maker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
       * {
@@ -17,7 +17,6 @@
       header {
         margin-top: 0px;
         width: 100%;
-        padding: 10px;
         border: 1px solid black;
         text-align: center;
         background: black;
@@ -31,10 +30,10 @@
       h1 {
         display: inline-block;
         color: white;
-        padding: 3px 10px;
         border: 1px solid black;
         background: black;
         text-shadow: 2px 2px rgba(3,248,252,0.53), -2px -2px rgba(252,3,215,0.53);
+        margin-bottom: 15px;
       }
       h2 {
         margin-bottom: 5px;
@@ -45,8 +44,9 @@
         background: black;
       }
       input {
-        width: 20%;
+        width: 50%;
         margin-right: 5px;
+        margin-top: 5px;
         border: 1px solid black;
       }
       button {
@@ -75,6 +75,9 @@
         cursor: pointer;
         box-shadow: inset 0px 0px 3px 2px lightgray;
       }
+      .turnedOn {
+        opacity: .05;
+      }
       .playlistPosition {
         padding: 1px 2px;
         background: white;
@@ -97,7 +100,7 @@
         width: 100%;
         border: 1px solid black;
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
       }
       #frame {
         width: 100%;
@@ -122,12 +125,16 @@
         align-items: center;
         justify-content: space-around;
       }
+      #currentlyViewing {
+        padding: 5px 0px 0px 0px;
+      }
       #controls {
         overflow: scroll;
         width: 100%;
         display: flex;
         border-left: 1px solid darkgray;
         border-right: 1px solid darkgray;
+        position: relative;
       }
       #extras {
         padding: 7px 10px;
@@ -147,7 +154,7 @@
       @media screen and (min-width: 700px) {
         header {
           width: 700px;
-          margin: 25px auto 0px auto;
+          margin: 0px auto;
         }
         main {
           width: 700px;
@@ -162,11 +169,15 @@
         }
         footer {
           width: 700px;
-          margin: 0px auto 25px auto;
+          margin: 0px auto;
+        }
+        h1 {
+          margin-bottom: 20px;
         }
         input {
           width: 100%;
           margin-left: 5px;
+          margin-top: 0px;
           border: 1px solid black;
         }
         .pushBox {
@@ -195,6 +206,7 @@
           border: 1px solid black;
           display: flex;
           flex-direction: row-reverse;
+          margin-top: 40px;
         }
         #frame {
           width: 100%;
@@ -233,13 +245,13 @@
           border-left: none;
           border-right: none;
         }
+        #currentlyViewing {
+          padding: 0px;
+        }
       }
     </style>
   </head>
   <body>
-    <header>
-      <h1>YouTube Playlist Maker</h1>
-    </header>
     <main>
       <section>
         <div id="shell">
@@ -280,6 +292,9 @@
     </main>
     <footer>
     </footer>
+    <header>
+      <h1>YouTube Playlist Maker</h1>
+    </header>
     <script>
       function main() {
         let bod = document.querySelector("body");
@@ -394,6 +409,37 @@
           for (let i = 0; i < e.length; i++) {
             if (e[i] !== "" && !e[i].includes("playlist") && !e[i].includes("search_query") && !e[i].includes("results") && Boolean(squeeze(e[i])) == true) {
               let pushBox = document.createElement("div");
+              pushBox.setAttribute("draggable","true");
+              pushBox.addEventListener("dragstart",function(e){
+                e.dataTransfer.setData("Text",pushBox.id)
+                let child = document.getElementById(pushBox.id);
+                let parent = child.parentNode;
+                let index = Array.prototype.indexOf.call(parent.children,child);
+                e.dataTransfer.setData("position",index)
+              });
+              pushBox.addEventListener("drop",function(e){
+                e.preventDefault();
+                let data = e.dataTransfer.getData("Text");
+                let position = e.dataTransfer.getData("position");
+                let child = document.getElementById(data);
+                let dropPosition = pushBox.id;
+                let parent = document.getElementById(dropPosition).parentNode;
+                let children = controls.children;
+                let index = Array.prototype.indexOf.call(parent.children,document.getElementById(dropPosition));
+                children[position].parentNode.insertBefore(children[position], children[index]);
+                let pBs = document.querySelectorAll(".pushBox");
+                let playlistIds = document.querySelectorAll(".playlistPosition");
+                for (let i = 0; i < pBs.length; i++) {
+                  playlistIds[i].innerHTML = i + 1;
+                }
+                let tempPs = document.querySelectorAll(".tempP");
+                let tempTracker = [];
+                for (let i = 0; i < tempPs.length; i++) {
+                  tempTracker.push(String("https://www.youtube.com/watch?v=" + tempPs[i].innerText))
+                }
+                resetting();
+                generate(tempTracker);
+              });
               if (controls.children.length == 0) {
                 videoBox.src = `https://www.youtube.com/embed/${squeeze(e[i])}`;
                 videoBox.height = "314px";
@@ -406,6 +452,7 @@
               pushBox.style.backgroundColor = "rgb(" + rN1 + "," + rN2 + "," + rN3 + ")";
               pushBox.style.backgroundImage = "url('http://img.youtube.com/vi/" + squeeze(e[i]) + "/0.jpg')";
               let tempP = document.createElement("p");
+              tempP.classList.add("tempP");
               tempP.style.display = "none";
               let tempTextNode = document.createTextNode(squeeze(e[i]));
               tempP.appendChild(tempTextNode);
@@ -454,6 +501,7 @@
                 resetting();
                 generate(finalTracker);
                 currentlyViewing.innerText = updatecurrentlyViewing();
+                videoBox.src = `https://www.youtube.com/embed/${squeeze(finalTracker[0])}`;
                 event.stopPropagation()
               });
               currentlyViewing.innerText = updatecurrentlyViewing();
@@ -557,6 +605,9 @@
             this.textContent = "Hide";
             displayValue = 0;
           }
+        });
+        controls.addEventListener("dragover",function(e){
+          e.preventDefault();
         });
       }
       main();
