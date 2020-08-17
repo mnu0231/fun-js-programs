@@ -17,9 +17,13 @@
       header {
         margin-top: 0px;
         width: 100%;
-        border: 1px solid black;
+        border: none;
         text-align: center;
         background: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
       }
       nav {
         border-top: 1px solid darkgray;
@@ -30,7 +34,7 @@
       h1 {
         display: inline-block;
         color: white;
-        border: 1px solid black;
+        border: none;
         background: black;
         text-shadow: 2px 2px rgba(3,248,252,0.53), -2px -2px rgba(252,3,215,0.53);
         margin-bottom: 15px;
@@ -40,13 +44,10 @@
         color: black;
         display: inline-block;
       }
-      section {
-        background: black;
-      }
       input {
         width: 50%;
         margin-right: 5px;
-        margin-top: 5px;
+        margin-top: 0px;
         border: 1px solid black;
       }
       button {
@@ -59,10 +60,10 @@
         border: 1px solid gold;
       }
       .pushBox {
-        width: 107px;
-        min-width: 107px;
+        width: 124px;
+        min-width: 124px;
         height: 60px;
-        border: 1px solid darkgray;
+        border: 1px solid black;
         font-size: 8px;
         display: flex;
         align-items: center;
@@ -80,14 +81,14 @@
       }
       .playlistPosition {
         padding: 1px 2px;
-        background: white;
+        background: rgba(255,255,255,0.63);
         position: absolute;
         left: 0px;
         top: 0px;
       }
       .deletePushBox {
         color: white;
-        background: rgba(0,0,0,0.83);
+        background: rgba(0,0,0,0.63);
         padding: 1px 2px;
         position: absolute;
         top: 0px;
@@ -98,7 +99,6 @@
       }
       #shell {
         width: 100%;
-        border: 1px solid black;
         display: flex;
         flex-direction: column-reverse;
       }
@@ -119,20 +119,23 @@
       #submissions button {
         margin-right: 5px;
         margin-top: 5px;
+        margin-bottom: 5px;
       }
       #loadSaveDIV, #submitResetDIV, #prevNextDIV, #currentlyViewingDIV {
         display: flex;
         align-items: center;
         justify-content: space-around;
       }
+      #currentlyViewingDIV {
+        margin-bottom: 0px;
+      }
       #currentlyViewing {
-        padding: 5px 0px 0px 0px;
+        padding: 0px;
       }
       #controls {
         overflow: scroll;
         width: 100%;
         display: flex;
-        border-left: 1px solid darkgray;
         border-right: 1px solid darkgray;
         position: relative;
       }
@@ -151,10 +154,25 @@
       #instButton {
         margin: 0px 0px 0px 10px;
       }
+      #bottomNav {
+        width: 100%;
+        border: none;
+      }
+      #lightDarkSlider {
+        margin-top: 0px;
+        margin-bottom: 20px;
+        border: none;
+        width: 150px;
+      }
       @media screen and (min-width: 700px) {
         header {
           width: 700px;
+          border: none;
           margin: 0px auto;
+          display: flex;
+          flex-direction: row;
+          align-items: flex-start;
+          justify-content: space-around;
         }
         main {
           width: 700px;
@@ -165,7 +183,7 @@
           border-left: none;
           border-bottom: 1px solid darkgray;
           height: 316px;
-          width: 125px;
+          width: 150px;
         }
         footer {
           width: 700px;
@@ -173,18 +191,21 @@
         }
         h1 {
           margin-bottom: 20px;
+          width: 75%;
+          border: none;
         }
         input {
-          width: 100%;
+          width: 110px;
           margin-left: 5px;
-          margin-top: 0px;
+          margin-right: 5px;
+          margin-top: 5px;
           border: 1px solid black;
         }
         .pushBox {
           height: 60px;
           min-height: 60px;
-          width: 105px;
-          min-width: 105px;
+          width: 124px;
+          min-width: 124px;
           border: 1px solid black;
           font-size: 8px;
           background-size: cover;
@@ -197,13 +218,12 @@
           padding: 1px 2px;
           position: absolute;
           top: 46px;
-          right: 94px;
+          right: 115px;
           display: block;
         }
         #shell {
           width: 100%;
           height: 316px;
-          border: 1px solid black;
           display: flex;
           flex-direction: row-reverse;
           margin-top: 40px;
@@ -216,7 +236,7 @@
           border-left: none;
         }
         #submissions {
-          height: 124px;
+          height: 134px;
           display: flex;
           flex-direction: column;
           align-items: space-around;
@@ -229,6 +249,7 @@
         #submissions button {
           margin-right: 0px;
           margin-top: 0px;
+          margin-bottom: 0px;
         }
         #loadSaveDIV, #submitResetDIV, #prevNextDIV, #currentlyViewingDIV {
           width: 100%;
@@ -236,8 +257,11 @@
           align-items: center;
           justify-content: space-around;
         }
+        #currentlyViewingDIV {
+          margin-bottom: 5px;
+        }
         #controls {
-          height: 190px;
+          height: 180px;
           overflow: scroll;
           display: flex;
           flex-direction: column;
@@ -246,7 +270,16 @@
           border-right: none;
         }
         #currentlyViewing {
-          padding: 0px;
+          padding-top: 0px;
+        }
+        #bottomNav {
+          height: 100%;
+          width: 200px;
+          border: none;
+        }
+        #lightDarkSlider {
+          margin-top: 12px;
+          border: none;
         }
       }
     </style>
@@ -294,10 +327,16 @@
     </footer>
     <header>
       <h1>YouTube Playlist Maker</h1>
+      <nav id="bottomNav">
+        <input type="range" min="0" value="0" max="255" id="lightDarkSlider">
+      </nav>
     </header>
     <script>
       function main() {
+        //All variables representing DOM elements, in order of appearance and/or priority.
         let bod = document.querySelector("body");
+        let header = document.querySelector("header");
+        let h1 = document.querySelector("h1");
         let frame = document.querySelector("#frame");
         let videoBox = document.querySelector("#frame iframe");
         let inputField = document.querySelector("#submissions input")
@@ -310,26 +349,33 @@
         let shuffle = document.querySelector("#shuffle");
         let currentlyViewing = document.querySelector("#currentlyViewing");
         let controls = document.querySelector("#controls");
+        let extras = document.querySelector("#extras");
         let inst = document.querySelector("#instructions");
         let instTtitle = document.querySelector("h2");
         let instButton = document.querySelector("#instButton");
         let instP = document.querySelector("#instructions p");
+        let lightDarkSlider = document.querySelector("#lightDarkSlider");
+        //The main array in this program, which holds the information necessary to add almost all interactivity.
         let tracker = [];
+        //Helpers variables.
         let id = 0;
         let displayValue = 0;
+        //Specific CSS conditions to both organize/isolate and make callable.
         function initialConditions(){
           //instP.style.display = "block";
           videoBox.style.display = "none";
         }
         initialConditions();
+        //Resets the YouTube Playlist Maker back to fresh, or brand new.
         function resetting(){
           controls.innerHTML = "";
           videoBox.src = ``;
-          videoBox.height = "0px";
+          videoBox.style.display = "none";
           inputField.value = "";
           tracker = [];
           id = 0;
         }
+        //Responsible for updating the playlist locator and length displays.
         function updatecurrentlyViewing(){
           let outOf = tracker.length;
           let atCurrently;
@@ -344,6 +390,7 @@
             return `0/${outOf}`;
           }
         }
+        //Ensures that the submitted YT video ID only contains characters used by YouTube.
         function idChecker(e){
           let library = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","-","_","0","1","2","3","4","5","6","7","8","9"];
           let ans = e.every(function(z){
@@ -357,6 +404,7 @@
           });
           return ans;
         }
+        //The main filtering function, used to make sure only secure and official YouTube videos are displayed.
         function squeeze(e){
           if ((e.includes("https://www.youtube.com/") || e.includes("https://m.youtube.com/") || e.includes("https://youtu.be/")) && (e.trim().indexOf("https://www.youtube.com/") == 0 || e.trim().indexOf("https://m.youtube.com/") == 0 || e.trim().indexOf("https://youtu.be/") == 0)) {
             if (e.includes("v=")) {
@@ -404,11 +452,17 @@
             return false;
           }
         }
+        //Primary function/action that builds the playlist every time it is called.
         function generate(e){
+          //Ensure that the YouTube iFrame element is displayed properly, which is hidden when the "Reset" button is pressed.
           videoBox.style.display = "block";
+          //A for loop that adds each YouTube video URL to the playlist.
           for (let i = 0; i < e.length; i++) {
+            //The URL must meet certain criteria for being added, such as not being a YT playlist, search query or result.
             if (e[i] !== "" && !e[i].includes("playlist") && !e[i].includes("search_query") && !e[i].includes("results") && Boolean(squeeze(e[i])) == true) {
+              //This pushBox variable is the primary variable used throughout each for loop to represent each playlist item.
               let pushBox = document.createElement("div");
+              //Drag And Drop interface code.
               pushBox.setAttribute("draggable","true");
               pushBox.addEventListener("dragstart",function(e){
                 e.dataTransfer.setData("Text",pushBox.id)
@@ -427,11 +481,6 @@
                 let children = controls.children;
                 let index = Array.prototype.indexOf.call(parent.children,document.getElementById(dropPosition));
                 children[position].parentNode.insertBefore(children[position], children[index]);
-                let pBs = document.querySelectorAll(".pushBox");
-                let playlistIds = document.querySelectorAll(".playlistPosition");
-                for (let i = 0; i < pBs.length; i++) {
-                  playlistIds[i].innerHTML = i + 1;
-                }
                 let tempPs = document.querySelectorAll(".tempP");
                 let tempTracker = [];
                 for (let i = 0; i < tempPs.length; i++) {
@@ -440,40 +489,53 @@
                 resetting();
                 generate(tempTracker);
               });
-              if (controls.children.length == 0) {
-                videoBox.src = `https://www.youtube.com/embed/${squeeze(e[i])}`;
-                videoBox.height = "314px";
-                pushBox.style.border = "1px solid gold";
-              }
+              //Adding the pushBox class to each playlist item.
               pushBox.classList.add("pushBox");
+              //Changing the background color to a random color, in case the YT preview thumbnail doesn't load.
               let rN1 = Math.floor(Math.random() * 256);
               let rN2 = Math.floor(Math.random() * 256);
               let rN3 = Math.floor(Math.random() * 256);
               pushBox.style.backgroundColor = "rgb(" + rN1 + "," + rN2 + "," + rN3 + ")";
+              //Accessing the YT preview thumbnail and setting it as the background image for the relevant pushBox div.
               pushBox.style.backgroundImage = "url('http://img.youtube.com/vi/" + squeeze(e[i]) + "/0.jpg')";
+              //Capturing the YT video ID and preventing it from being displayed.
               let tempP = document.createElement("p");
               tempP.classList.add("tempP");
               tempP.style.display = "none";
               let tempTextNode = document.createTextNode(squeeze(e[i]));
               tempP.appendChild(tempTextNode);
               pushBox.appendChild(tempP);
+              //Adding the pushBox div to the playlist.
               controls.appendChild(pushBox);
+              //Populating the tracker array.
               if (tracker.length == 0) {
                 tracker.push({active:true,pushBox:id.toString(),yT:squeeze(e[i])});
               } else {
                 tracker.push({active:false,pushBox:id.toString(),yT:squeeze(e[i])});
               }
               pushBox.id = (id++).toString();
+              //Ensuring the first element of the tracker array is displayed.
+              let pushBoxes = document.querySelectorAll(".pushBox")
+              for (let t of tracker) {
+                if (t.active === true) {
+                  videoBox.src = `https://www.youtube.com/embed/${t.yT}`;
+                  videoBox.height = "314px";
+                  pushBoxes[t.pushBox].style.border = "1px solid gold";
+                }
+              }
+              //Creating and publishing the playlist position number.
               let playlistPosition = document.createElement("p");
               playlistPosition.classList.add("playlistPosition");
               let playlistNumber = document.createTextNode(Number(pushBox.id) + 1);
               playlistPosition.appendChild(playlistNumber);
               pushBox.appendChild(playlistPosition);
+              //Creating and publishing the option to delete individual videos.
               let deletePushBox = document.createElement("p");
               deletePushBox.classList.add("deletePushBox");
               let deletePushBoxText = document.createTextNode("X");
               deletePushBox.appendChild(deletePushBoxText);
               pushBox.appendChild(deletePushBox);
+              //Updating the active/displayed YouTube video when a playlist element is clicked or tapped on.
               pushBox.addEventListener("click",function(){
                 videoBox.src = `https://www.youtube.com/embed/${tempP.innerHTML}`;
                 let ch = controls.children;
@@ -490,6 +552,7 @@
                 }
                 currentlyViewing.innerText = updatecurrentlyViewing();
               });
+              //Adding the function needed for deleting individual playlist elements.
               deletePushBox.addEventListener("click",function(event){
                 let finalTracker = [];
                 for (let t in tracker) {
@@ -501,21 +564,24 @@
                 resetting();
                 generate(finalTracker);
                 currentlyViewing.innerText = updatecurrentlyViewing();
-                videoBox.src = `https://www.youtube.com/embed/${squeeze(finalTracker[0])}`;
+                //videoBox.src = `https://www.youtube.com/embed/${squeeze(finalTracker[0])}`;
                 event.stopPropagation()
               });
               currentlyViewing.innerText = updatecurrentlyViewing();
             }
           }
         }
+        //The "Submit" button's click event listener.
         submitButton.addEventListener("click",function(){
           let userInput = inputField.value.split(",");
           generate(userInput);
         });
+        //The "Reset" button's click event listener.
         reset.addEventListener("click",function(){
           resetting();
           currentlyViewing.innerText = "0/0";
         });
+        //The "Save" button's click event listener.
         save.addEventListener("click",function(){
           let zeURLs = [];
           let conCh = controls.children;
@@ -526,12 +592,14 @@
             localStorage.setItem("ids",JSON.stringify(zeURLs));
           }
         });
+        //The "Load" button's click event listener.
         load.addEventListener("click",function(){
           resetting();
           let data = localStorage.getItem("ids");
           let dataOpened = JSON.parse(data);
           generate(dataOpened);
         });
+        //The "Prev" button's click event listener.
         prev.addEventListener("click",function(){
           let active;
           for (let i = 0; i < tracker.length; i++) {
@@ -549,6 +617,7 @@
             currentlyViewing.innerText = updatecurrentlyViewing();
           }
         });
+        //The "Next" button's click event listener.
         next.addEventListener("click",function(){
           let active;
           for (let i = 0; i < tracker.length; i++) {
@@ -566,6 +635,7 @@
             currentlyViewing.innerText = updatecurrentlyViewing();
           }
         });
+        //The "Shfl" button's click event listener.
         shuffle.addEventListener("click",function(){
           if (tracker.length > 0) {
             let sortedTracker = tracker.sort(function(a,b){
@@ -587,28 +657,42 @@
             generate(finalTracker);
           }
         });
+        //The "Display" button's click event listener. This button is associated with the "Instructions" H2 and P elements.
         instButton.addEventListener("click",function(){
           if (displayValue == 0) {
-            inst.style.backgroundColor = "black";
-            inst.style.padding = "10px";
-            inst.style.border = "1px solid black";
-            instTtitle.style.color = "white";
             instP.style.display = "none";
             this.textContent = "Display";
             displayValue++;
           } else {
-            inst.style.backgroundColor = "white";
-            inst.style.padding = "10px";
-            inst.style.border = "1px solid white";
-            instTtitle.style.color = "black";
             instP.style.display = "block";
             this.textContent = "Hide";
             displayValue = 0;
           }
         });
+        //Changing the lightness of the background color.
+        lightDarkSlider.addEventListener("input",function(){
+          let v = this.value;
+          bod.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
+          controls.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
+          header.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
+          extras.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
+          h1.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
+          h1.style.color = "rgb(" + (255 - v) + "," + (255 - v) + "," + (255 - v) + ")";
+          
+        });
+        //Making sure the Drag and Drop feature is limited to the controls div.
         controls.addEventListener("dragover",function(e){
           e.preventDefault();
         });
+        //////////////////////////////////Feature Comments Start
+        //Make the comments more robust and accurate.
+        //Make the Drag and Drop interface smarter, and mobile/touch friendly. Is that possible?
+        //Allow for multiple saved playlists, selectable via an auto-populating dropdown menu and associated "Load" button.
+        //Determine whether or not an autoplay feature is possible.
+        //////////////////////////////////Feature Comments End
+        //////////////////////////////////Bug Comments Start
+        //Bug #1 - When shuffling and deleting videos, too often the YouTube embed/display does not load properly; displaying only the black background of the #frame DIV. This bug is, at this point, a mystery. But it too shall be resolved.
+        //////////////////////////////////Bug Comments End
       }
       main();
     </script>
