@@ -333,7 +333,7 @@
     </header>
     <script>
       function main() {
-        //All variables representing DOM elements, in order of appearance and/or priority.
+        //All variables representing DOM elements, in their order of appearance and/or priority.
         let bod = document.querySelector("body");
         let header = document.querySelector("header");
         let h1 = document.querySelector("h1");
@@ -355,27 +355,27 @@
         let instButton = document.querySelector("#instButton");
         let instP = document.querySelector("#instructions p");
         let lightDarkSlider = document.querySelector("#lightDarkSlider");
-        //The main array in this program, which holds the information necessary to add almost all interactivity.
+        //The main array in this program, which typically holds information necessary for almost all interactivity. Is regularly filled with and emptied of data, based on how the user interfaces with the YouTube Playlist Maker.
         let tracker = [];
-        //Helpers variables.
+        //Helper or secondary variables.
         let id = 0;
         let displayValue = 0;
         //Specific CSS conditions to both organize/isolate and make callable.
         function initialConditions(){
-          //instP.style.display = "block";
           videoBox.style.display = "none";
         }
         initialConditions();
-        //Resets the YouTube Playlist Maker back to fresh, or brand new.
+        //Resets the entire YouTube Playlist Maker back to fresh or brand new, as if the user has only just arrived.
         function resetting(){
+          //Does not change/reset the background color to its original condition(s).
           controls.innerHTML = "";
           videoBox.src = ``;
-          videoBox.style.display = "none";
           inputField.value = "";
           tracker = [];
           id = 0;
+          initialConditions();
         }
-        //Responsible for updating the playlist locator and length displays.
+        //Responsible for updating the playlist locator and length display(s) text.
         function updatecurrentlyViewing(){
           let outOf = tracker.length;
           let atCurrently;
@@ -390,7 +390,7 @@
             return `0/${outOf}`;
           }
         }
-        //Ensures that the submitted YT video ID only contains characters used by YouTube.
+        //Ensures that the submitted YT video ID only contains characters used by the YouTube platform. Allows for flexibility of ID character legnth.
         function idChecker(e){
           let library = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","-","_","0","1","2","3","4","5","6","7","8","9"];
           let ans = e.every(function(z){
@@ -404,7 +404,7 @@
           });
           return ans;
         }
-        //The main filtering function, used to make sure only secure and official YouTube videos are displayed.
+        //The main filtering function, used to make sure only secure and official YouTube videos are displayed. Including all mobile and desktop videos, as well as those shared with the YT URL link shortener.
         function squeeze(e){
           if ((e.includes("https://www.youtube.com/") || e.includes("https://m.youtube.com/") || e.includes("https://youtu.be/")) && (e.trim().indexOf("https://www.youtube.com/") == 0 || e.trim().indexOf("https://m.youtube.com/") == 0 || e.trim().indexOf("https://youtu.be/") == 0)) {
             if (e.includes("v=")) {
@@ -454,13 +454,13 @@
         }
         //Primary function/action that builds the playlist every time it is called.
         function generate(e){
-          //Ensure that the YouTube iFrame element is displayed properly, which is hidden when the "Reset" button is pressed.
+          //Ensure that the YouTube iFrame element is displayed properly, which is hidden by default and when the "Reset" button is pressed.
           videoBox.style.display = "block";
-          //A for loop that adds each YouTube video URL to the playlist.
+          //A for loop that adds each properly submitted YouTube video URL to the playlist.
           for (let i = 0; i < e.length; i++) {
-            //The URL must meet certain criteria for being added, such as not being a YT playlist, search query or result.
+            //The URL must meet certain criteria for being added, such as not being a YT playlist, search query or search result.
             if (e[i] !== "" && !e[i].includes("playlist") && !e[i].includes("search_query") && !e[i].includes("results") && Boolean(squeeze(e[i])) == true) {
-              //This pushBox variable is the primary variable used throughout each for loop to represent each playlist item.
+              //This pushBox variable is the primary variable used throughout each for loop pass to represent the relevant playlist item.
               let pushBox = document.createElement("div");
               //Drag And Drop interface code.
               pushBox.setAttribute("draggable","true");
@@ -489,32 +489,33 @@
                 resetting();
                 generate(tempTracker);
               });
-              //Adding the pushBox class to each playlist item.
+              //Adding the pushBox (CSS) class to each playlist item.
               pushBox.classList.add("pushBox");
-              //Changing the background color to a random color, in case the YT preview thumbnail doesn't load.
+              //Changing the background color to a random color; which is useful (for purposes of navigation) in the event that the YT preview thumbnail doesn't load.
               let rN1 = Math.floor(Math.random() * 256);
               let rN2 = Math.floor(Math.random() * 256);
               let rN3 = Math.floor(Math.random() * 256);
               pushBox.style.backgroundColor = "rgb(" + rN1 + "," + rN2 + "," + rN3 + ")";
               //Accessing the YT preview thumbnail and setting it as the background image for the relevant pushBox div.
               pushBox.style.backgroundImage = "url('http://img.youtube.com/vi/" + squeeze(e[i]) + "/0.jpg')";
-              //Capturing the YT video ID and preventing it from being displayed.
+              //Capturing the YT video ID and preventing the relevant P element from being displayed.
               let tempP = document.createElement("p");
               tempP.classList.add("tempP");
               tempP.style.display = "none";
               let tempTextNode = document.createTextNode(squeeze(e[i]));
               tempP.appendChild(tempTextNode);
               pushBox.appendChild(tempP);
-              //Adding the pushBox div to the playlist.
+              //Adding the pushBox div to the playlist interface.
               controls.appendChild(pushBox);
-              //Populating the tracker array.
+              //Populating the tracker array with information about this particular pushBox div.
               if (tracker.length == 0) {
                 tracker.push({active:true,pushBox:id.toString(),yT:squeeze(e[i])});
               } else {
                 tracker.push({active:false,pushBox:id.toString(),yT:squeeze(e[i])});
               }
+              //Giving the pushBox div an id, which is used to identify each playlist item whenever accessed.
               pushBox.id = (id++).toString();
-              //Ensuring the first element of the tracker array is displayed.
+              //Ensuring that the YouTube URL ID associated with the first element of the tracker array is displayed.
               let pushBoxes = document.querySelectorAll(".pushBox")
               for (let t of tracker) {
                 if (t.active === true) {
@@ -523,13 +524,13 @@
                   pushBoxes[t.pushBox].style.border = "1px solid gold";
                 }
               }
-              //Creating and publishing the playlist position number.
+              //Creating and publishing the playlist position number for this particular pushBox div.
               let playlistPosition = document.createElement("p");
               playlistPosition.classList.add("playlistPosition");
               let playlistNumber = document.createTextNode(Number(pushBox.id) + 1);
               playlistPosition.appendChild(playlistNumber);
               pushBox.appendChild(playlistPosition);
-              //Creating and publishing the option to delete individual videos.
+              //Creating and publishing the (div element related to the) option to delete individual videos from the playlist interface.
               let deletePushBox = document.createElement("p");
               deletePushBox.classList.add("deletePushBox");
               let deletePushBoxText = document.createTextNode("X");
@@ -552,7 +553,7 @@
                 }
                 currentlyViewing.innerText = updatecurrentlyViewing();
               });
-              //Adding the function needed for deleting individual playlist elements.
+              //Adding the function/intelligence needed for deleting individual playlist elements.
               deletePushBox.addEventListener("click",function(event){
                 let finalTracker = [];
                 for (let t in tracker) {
@@ -564,24 +565,23 @@
                 resetting();
                 generate(finalTracker);
                 currentlyViewing.innerText = updatecurrentlyViewing();
-                //videoBox.src = `https://www.youtube.com/embed/${squeeze(finalTracker[0])}`;
                 event.stopPropagation()
               });
               currentlyViewing.innerText = updatecurrentlyViewing();
             }
           }
         }
-        //The "Submit" button's click event listener.
+        //The "Submit" button's click event listener adds new videos or elements to the existing/displayed playlist.
         submitButton.addEventListener("click",function(){
           let userInput = inputField.value.split(",");
           generate(userInput);
         });
-        //The "Reset" button's click event listener.
+        //The "Reset" button's click event listener is specifically intended to call the "resetting()" function.
         reset.addEventListener("click",function(){
           resetting();
           currentlyViewing.innerText = "0/0";
         });
-        //The "Save" button's click event listener.
+        //The "Save" button's click event listener, which saves a small JSON file to the user's browser, intended to be access by the user at a later time.
         save.addEventListener("click",function(){
           let zeURLs = [];
           let conCh = controls.children;
@@ -592,14 +592,14 @@
             localStorage.setItem("ids",JSON.stringify(zeURLs));
           }
         });
-        //The "Load" button's click event listener.
+        //The "Load" button's click event listener first clears and then populates the playlist body, based on whatever URL were initially saved (as a JSON file) by the user.
         load.addEventListener("click",function(){
           resetting();
           let data = localStorage.getItem("ids");
           let dataOpened = JSON.parse(data);
           generate(dataOpened);
         });
-        //The "Prev" button's click event listener.
+        //The "Prev" button's click event listener displays the video of the element before the current or active element, unless the first video is already being displayed.
         prev.addEventListener("click",function(){
           let active;
           for (let i = 0; i < tracker.length; i++) {
@@ -617,7 +617,7 @@
             currentlyViewing.innerText = updatecurrentlyViewing();
           }
         });
-        //The "Next" button's click event listener.
+        //The "Next" button's click event listener displays the video of the element after the current or active element, unless the last video is already being displayed.
         next.addEventListener("click",function(){
           let active;
           for (let i = 0; i < tracker.length; i++) {
@@ -635,7 +635,7 @@
             currentlyViewing.innerText = updatecurrentlyViewing();
           }
         });
-        //The "Shfl" button's click event listener.
+        //The "Shfl" button's click event listener randomly reorders playlist elements, via a sort method on the tracker variable.
         shuffle.addEventListener("click",function(){
           if (tracker.length > 0) {
             let sortedTracker = tracker.sort(function(a,b){
@@ -657,7 +657,7 @@
             generate(finalTracker);
           }
         });
-        //The "Display" button's click event listener. This button is associated with the "Instructions" H2 and P elements.
+        //The "Display" button's click event listener. This button is associated with displaying and hiding the "Instructions" H2 and P elements.
         instButton.addEventListener("click",function(){
           if (displayValue == 0) {
             instP.style.display = "none";
@@ -669,7 +669,7 @@
             displayValue = 0;
           }
         });
-        //Changing the lightness of the background color.
+        //Changing the lightness of the widget's primary color.
         lightDarkSlider.addEventListener("input",function(){
           let v = this.value;
           bod.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
@@ -678,18 +678,20 @@
           extras.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
           h1.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
           h1.style.color = "rgb(" + (255 - v) + "," + (255 - v) + "," + (255 - v) + ")";
-          
         });
         //Making sure the Drag and Drop feature is limited to the controls div.
         controls.addEventListener("dragover",function(e){
           e.preventDefault();
         });
         //////////////////////////////////Feature Comments Start
-        //Make the comments more robust and accurate.
         //Make the Drag and Drop interface smarter, and mobile/touch friendly. Is that possible?
         //Allow for multiple saved playlists, selectable via an auto-populating dropdown menu and associated "Load" button.
         //Determine whether or not an autoplay feature is possible.
         //////////////////////////////////Feature Comments End
+        //////////////////////////////////Code Comments Start
+        //This program (especially its functions) can be reduced in size, and will be.
+        //Should the resetting() and generate() functions be used in tandem so often?
+        //////////////////////////////////Code Comments End
         //////////////////////////////////Bug Comments Start
         //Bug #1 - When shuffling and deleting videos, too often the YouTube embed/display does not load properly; displaying only the black background of the #frame DIV. This bug is, at this point, a mystery. But it too shall be resolved.
         //////////////////////////////////Bug Comments End
