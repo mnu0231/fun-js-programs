@@ -97,6 +97,58 @@
       .deletePushBox:hover {
         background: rgba(255,0,0,0.83);
       }
+      .popUp {
+        border: 1px solid white;
+        background-color: white;
+        position: absolute;
+        width: 200px;
+        max-width: 200px;
+        max-height: 90vh;
+        top: 10vh;
+        padding: 10px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+      }
+      .innerDIVLoad {
+        padding: 5px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .playlistTitle {
+        font-weight: bold;
+        display: block;
+        max-width: 175px;
+        overflow: hidden;
+      }
+      .playlistTitle:hover {
+        cursor: pointer;
+        color: lightgray;
+      }
+      .deletion {
+        display: inline;
+        margin-left: 15px;
+        padding: 1px 2px;
+      }
+      .deletion:hover {
+        background-color: red;
+        color: white;
+        cursor: pointer;
+      }
+      .deletePopUp {
+        font-size: 12px;
+        padding: 1px;
+        width: 15px;
+        text-align: center;
+        margin-left: -10px;
+        margin-top: -12px;
+      }
+      .deletePopUp:hover {
+        background-color: red;
+        color: white;
+        cursor: pointer;
+      }
       #shell {
         width: 100%;
         display: flex;
@@ -355,6 +407,9 @@
         let instButton = document.querySelector("#instButton");
         let instP = document.querySelector("#instructions p");
         let lightDarkSlider = document.querySelector("#lightDarkSlider");
+        //Load interface variables.
+        let popUp;
+        let popUpActive = 0;
         //The main array in this program, which typically holds information necessary for almost all interactivity. Is regularly filled with and emptied of data, based on how the user interfaces with the YouTube Playlist Maker.
         let tracker = [];
         //Helper or secondary variables.
@@ -583,21 +638,116 @@
         });
         //The "Save" button's click event listener, which saves a small JSON file to the user's browser, intended to be access by the user at a later time.
         save.addEventListener("click",function(){
-          let zeURLs = [];
+          let name;
+          let zeURLs;
           let conCh = controls.children;
           if (conCh.length > 0) {
+            name = prompt("What is the title of your playlist?");
+            zeURLs = [{id:name}];
             for (let c of conCh) {
               zeURLs.push("https://www.youtube.com/watch?v=" + c.firstElementChild.textContent);
             }
-            localStorage.setItem("ids",JSON.stringify(zeURLs));
           }
+          if (localStorage.length < 1) {
+            localStorage.setItem("master",JSON.stringify([]));
+          }
+          let o = localStorage.getItem("master");
+          let p = JSON.parse(o);
+          let secure = [];
+          for (let b = 0; b < p.length; b++) {
+            secure.push(p[b][0].id)
+          }
+          if (secure.every(function(e){return e != name})) {
+            p.push(zeURLs);
+            if (name) {
+              localStorage.setItem("master",JSON.stringify(p));
+            }
+          } else if (secure.some(function(e){return e == name})) {
+            for (let s in secure) {
+              if (secure[s] == name) {
+                p[s] = [{id:name}];
+                let conCh2 = controls.children;
+                if (conCh2.length > 0) {
+                  for (let c of conCh2) {
+                    p[s].push("https://www.youtube.com/watch?v=" + c.firstElementChild.textContent);
+                  }
+                }
+                localStorage.setItem("master",JSON.stringify(p));
+              }
+            }
+          }
+          //popUpActive = 0;
         });
         //The "Load" button's click event listener first clears and then populates the playlist body, based on whatever URL were initially saved (as a JSON file) by the user.
         load.addEventListener("click",function(){
-          resetting();
-          let data = localStorage.getItem("ids");
-          let dataOpened = JSON.parse(data);
-          generate(dataOpened);
+          if (popUpActive == 0) {
+            ++popUpActive;
+            popUp = document.createElement("div");
+            let deletePopUp = document.createElement("div");
+            deletePopUp.classList.add("deletePopUp");
+            let deletePopUpX = document.createTextNode("x");
+            deletePopUp.appendChild(deletePopUpX);
+            deletePopUp.addEventListener("click",function(){
+              popUpActive = 0;
+              bod.removeChild(popUp);
+            });
+            popUp.appendChild(deletePopUp);
+            popUp.classList.add("popUp");
+            let o = localStorage.getItem("master");
+            let p = JSON.parse(o);
+            let names = [];
+            for (let i = 0; i < p.length; i++) {
+              names.push(p[i][0].id);
+            }
+            for (let n of names) {
+              let innerDIV = document.createElement("div");
+              innerDIV.classList.add("innerDIVLoad");
+              popUp.appendChild(innerDIV);
+              let tempP = document.createElement("p");
+              tempP.classList.add("playlistTitle");
+              tempP.addEventListener("click",function(){
+                popUpActive = 0;
+                bod.removeChild(popUp);
+                let o = localStorage.getItem("master");
+                let p = JSON.parse(o);
+                let urlData = [];
+                for (let z = 0; z < p.length; z++) {
+                  if (p[z][0].id == n) {
+                    for (let i = 1; i < p[z].length; i++) {
+                      urlData.push(p[z][i]);
+                    }
+                  }
+                }
+                resetting();
+                generate(urlData);
+              });
+              let tempTextNode = document.createTextNode(n);
+              tempP.appendChild(tempTextNode);
+              innerDIV.appendChild(tempP);
+              let deletion = document.createElement("p");
+              deletion.classList.add("deletion");
+              let deletionX = document.createTextNode("X");
+              deletion.appendChild(deletionX);
+              innerDIV.appendChild(deletion);
+              deletion.addEventListener("click",function(){
+                popUp.removeChild(innerDIV);
+                let o = localStorage.getItem("master");
+                let p = JSON.parse(o);
+                let newMaster;
+                for (let z = 0; z < p.length; z++) {
+                  if (p[z][0].id == n) {
+                    let firstPart = p.slice(0,z);
+                    let secondPart = p.slice(z + 1);
+                    newMaster = firstPart.concat(secondPart);
+                  }
+                }
+                localStorage.setItem("master",JSON.stringify(newMaster));
+              });
+            }
+            let innerWidth = window.innerWidth;
+            popUp.style.left = ((innerWidth / 2) - 100) + "px";
+            bod.appendChild(popUp);
+          }
         });
         //The "Prev" button's click event listener displays the video of the element before the current or active element, unless the first video is already being displayed.
         prev.addEventListener("click",function(){
@@ -683,9 +833,13 @@
         controls.addEventListener("dragover",function(e){
           e.preventDefault();
         });
+        //Event listener for the resizing of the window/viewport.
+        window.addEventListener("resize",function(){
+          let innerWidth = window.innerWidth;
+          popUp.style.left = ((innerWidth / 2) - 100) + "px";
+        });
         //////////////////////////////////Feature Comments Start
         //Make the Drag and Drop interface smarter, and mobile/touch friendly. Is that possible?
-        //Allow for multiple saved playlists, selectable via an auto-populating dropdown menu and associated "Load" button.
         //Determine whether or not an autoplay feature is possible.
         //////////////////////////////////Feature Comments End
         //////////////////////////////////Code Comments Start
