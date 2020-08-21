@@ -98,7 +98,7 @@
         background: rgba(255,0,0,0.83);
       }
       .popUp {
-        border: 1px solid white;
+        border: 1px solid black;
         background-color: white;
         position: absolute;
         width: 200px;
@@ -108,6 +108,7 @@
         padding: 10px;
         overflow-y: scroll;
         overflow-x: hidden;
+        box-shadow: 0px 0px 3px 0px darkgray;
       }
       .innerDIVLoad {
         padding: 5px;
@@ -115,6 +116,10 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        border: 1px solid white;
+      }
+      .innerDIVLoad:hover {
+        border: 1px solid gold;
       }
       .playlistTitle {
         font-weight: bold;
@@ -183,6 +188,8 @@
       }
       #currentlyViewing {
         padding: 0px;
+        width: 48%;
+        text-align: center;
       }
       #controls {
         overflow: scroll;
@@ -197,7 +204,7 @@
       #instructions {
         width: 100%;
         border: 1px solid white;
-        padding: 10px;
+        padding: 5px 10px 10px 10px;
         background: white;
       }
       #instructions p {
@@ -215,6 +222,18 @@
         margin-bottom: 20px;
         border: none;
         width: 150px;
+      }
+      #loadedPlaylistInfo {
+        display: none;
+        background-color: white;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+        justify-content: flex-end;
+      }
+      #loadedPlaylistSave {
+        margin-right: 10px;
       }
       @media screen and (min-width: 700px) {
         header {
@@ -302,6 +321,7 @@
           margin-right: 0px;
           margin-top: 0px;
           margin-bottom: 0px;
+          width: 48%;
         }
         #loadSaveDIV, #submitResetDIV, #prevNextDIV, #currentlyViewingDIV {
           width: 100%;
@@ -348,7 +368,7 @@
                 <button id="reset">Reset</button>
               </div>
               <div id="loadSaveDIV">
-                <button id="save">Save</button>
+                <button id="save">Save As</button>
                 <button id="load">Load</button>
               </div>
               <div id="prevNextDIV">
@@ -368,6 +388,10 @@
         </div>
       </section>
       <section id="extras">
+        <div id="loadedPlaylistInfo">
+          <button id="loadedPlaylistSave">Save</button>
+          <p><b>Playlist Title:</b> <span id="loadedPlaylistTitle"></span></p>
+        </div>
         <div id="instructions">
           <h2>Instructions</h2>
           <button id="instButton">Hide</button>
@@ -407,6 +431,9 @@
         let instButton = document.querySelector("#instButton");
         let instP = document.querySelector("#instructions p");
         let lightDarkSlider = document.querySelector("#lightDarkSlider");
+        let loadedPlaylistInfo = document.querySelector("#loadedPlaylistInfo");
+        let loadedPlaylistSave = document.querySelector("#loadedPlaylistSave");
+        let loadedPlaylistTitle = document.querySelector("#loadedPlaylistTitle");
         //Load interface variables.
         let popUp;
         let popUpActive = 0;
@@ -634,6 +661,7 @@
         //The "Reset" button's click event listener is specifically intended to call the "resetting()" function.
         reset.addEventListener("click",function(){
           resetting();
+          loadedPlaylistInfo.style.display = "none";
           currentlyViewing.innerText = "0/0";
         });
         //The "Save" button's click event listener, which saves a small JSON file to the user's browser, intended to be access by the user at a later time.
@@ -661,6 +689,8 @@
             p.push(zeURLs);
             if (name) {
               localStorage.setItem("master",JSON.stringify(p));
+              loadedPlaylistInfo.style.display = "flex";
+              loadedPlaylistTitle.textContent = name;
             }
           } else if (secure.some(function(e){return e == name})) {
             for (let s in secure) {
@@ -673,10 +703,11 @@
                   }
                 }
                 localStorage.setItem("master",JSON.stringify(p));
+                loadedPlaylistInfo.style.display = "flex";
+                loadedPlaylistTitle.textContent = name;
               }
             }
           }
-          //popUpActive = 0;
         });
         //The "Load" button's click event listener first clears and then populates the playlist body, based on whatever URL were initially saved (as a JSON file) by the user.
         load.addEventListener("click",function(){
@@ -693,6 +724,9 @@
             });
             popUp.appendChild(deletePopUp);
             popUp.classList.add("popUp");
+            if (localStorage.length < 1) {
+              localStorage.setItem("master",JSON.stringify([]));
+            }
             let o = localStorage.getItem("master");
             let p = JSON.parse(o);
             let names = [];
@@ -713,6 +747,8 @@
                 let urlData = [];
                 for (let z = 0; z < p.length; z++) {
                   if (p[z][0].id == n) {
+                    loadedPlaylistInfo.style.display = "flex";
+                    loadedPlaylistTitle.textContent = n;
                     for (let i = 1; i < p[z].length; i++) {
                       urlData.push(p[z][i]);
                     }
@@ -819,6 +855,33 @@
             displayValue = 0;
           }
         });
+        //Saving the order and number of videos for an already loaded playlist.
+        loadedPlaylistSave.addEventListener("click",function(){
+          let name = loadedPlaylistTitle.textContent;
+          let zeURLs = [{id:name}];
+          let conCh = controls.children;
+          for (let c of conCh) {
+            zeURLs.push("https://www.youtube.com/watch?v=" + c.firstElementChild.textContent);
+          }
+          let o = localStorage.getItem("master");
+          let p = JSON.parse(o);
+          let secure = [];
+          for (let b = 0; b < p.length; b++) {
+            secure.push(p[b][0].id)
+          }
+          for (let s in secure) {
+            if (secure[s] == name) {
+              p[s] = [{id:name}];
+              let conCh2 = controls.children;
+              if (conCh2.length > 0) {
+                for (let c of conCh2) {
+                  p[s].push("https://www.youtube.com/watch?v=" + c.firstElementChild.textContent);
+                }
+              }
+              localStorage.setItem("master",JSON.stringify(p));
+            }
+          }
+        });
         //Changing the lightness of the widget's primary color.
         lightDarkSlider.addEventListener("input",function(){
           let v = this.value;
@@ -841,6 +904,8 @@
         //////////////////////////////////Feature Comments Start
         //Make the Drag and Drop interface smarter, and mobile/touch friendly. Is that possible?
         //Determine whether or not an autoplay feature is possible.
+        //Update the Instructions text to more accurately reflect new features, such as how to (re-)save and load playlists.
+        //Update the JS comments to be even more accurate and robust.
         //////////////////////////////////Feature Comments End
         //////////////////////////////////Code Comments Start
         //This program (especially its functions) can be reduced in size, and will be.
