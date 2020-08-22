@@ -31,6 +31,14 @@
         border-bottom: 1px solid darkgray;
         width: 100%;
       }
+      footer {
+        width: 100%;
+        padding: 10px;
+        background-color: black;
+        color: white;
+        font-size: 10px;
+        text-align: center;
+      }
       h1 {
         display: inline-block;
         color: white;
@@ -103,7 +111,7 @@
         position: absolute;
         width: 200px;
         max-width: 200px;
-        max-height: 90vh;
+        max-height: 80vh;
         top: 10vh;
         padding: 10px;
         overflow-y: scroll;
@@ -219,7 +227,7 @@
       }
       #lightDarkSlider {
         margin-top: 0px;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         border: none;
         width: 150px;
       }
@@ -228,12 +236,16 @@
         background-color: white;
         width: 100%;
         padding: 10px;
+        margin-top: 3px;
         margin-bottom: 10px;
         align-items: center;
         justify-content: flex-end;
       }
       #loadedPlaylistSave {
         margin-right: 10px;
+      }
+      #builtBy {
+        margin: 10px 0px 20px 0px;
       }
       @media screen and (min-width: 700px) {
         header {
@@ -266,9 +278,9 @@
           border: none;
         }
         input {
-          width: 110px;
-          margin-left: 5px;
-          margin-right: 5px;
+          width: 119px;
+          margin-left: 0px;
+          margin-right: 0px;
           margin-top: 5px;
           border: 1px solid black;
         }
@@ -395,23 +407,28 @@
         <div id="instructions">
           <h2>Instructions</h2>
           <button id="instButton">Hide</button>
-          <p>Add a comma separated list of YouTube video URLs into the text box, and press the <b>Submit</b> button to have your playlist produced. You can also preserve your playlist by pressing the <b>Save</b> button, which uploads a JSON file to your browser's local storage. That same JSON file can then be later accessed by pressing the <b>Load</b> button.</p>
+          <p>Add a comma separated list of YouTube video URLs into the text box, and press the <b>Submit</b> button to have your playlist generated. You can also preserve your playlist by pressing the <b>Save</b> button, which uploads a JSON file to your browser's local storage. That same JSON file can then be later accessed by pressing the <b>Load</b> button.</p>
         </div>
       </section>
     </main>
-    <footer>
-    </footer>
     <header>
       <h1>YouTube Playlist Maker</h1>
       <nav id="bottomNav">
         <input type="range" min="0" value="0" max="255" id="lightDarkSlider">
       </nav>
     </header>
+    <footer>
+      <p>This project is for demonstration purposes only, and the developer does not claim any intellectual property herein. The word "YouTube" is owned by Google. Thus, there is no license associated with this program, nor is there any guarantee of performance.</p>
+      <p id="builtBy">Built By: Bret Bernhoft</p>
+    </footer>
     <script>
       function main() {
         //All variables representing DOM elements, in their order of appearance and/or priority.
         let bod = document.querySelector("body");
         let header = document.querySelector("header");
+        let footer = document.querySelector("footer");
+        let footerText = document.querySelector("footer p");
+        let builtBy = document.querySelector("#builtBy");
         let h1 = document.querySelector("h1");
         let frame = document.querySelector("#frame");
         let videoBox = document.querySelector("#frame iframe");
@@ -437,7 +454,7 @@
         //Load interface variables.
         let popUp;
         let popUpActive = 0;
-        //The main array in this program, which typically holds information necessary for almost all interactivity. Is regularly filled with and emptied of data, based on how the user interfaces with the YouTube Playlist Maker.
+        //The tracker variable is the main array used in this program, which (typically) holds information necessary for almost all interactivity. Is regularly filled with and emptied of data, based on how the user interfaces with the YouTube Playlist Maker.
         let tracker = [];
         //Helper or secondary variables.
         let id = 0;
@@ -449,7 +466,7 @@
         initialConditions();
         //Resets the entire YouTube Playlist Maker back to fresh or brand new, as if the user has only just arrived.
         function resetting(){
-          //Does not change/reset the background color to its original condition(s).
+          //Does not change/reset the background color to its original condition(s); the value of which can be manipulated via a slider in the UI.
           controls.innerHTML = "";
           videoBox.src = ``;
           inputField.value = "";
@@ -472,7 +489,7 @@
             return `0/${outOf}`;
           }
         }
-        //Ensures that the submitted YT video ID only contains characters used by the YouTube platform. Allows for flexibility of ID character legnth.
+        //Ensures that the submitted YT video ID only contains characters used by the YouTube platform. Allows for flexibility of ID character length.
         function idChecker(e){
           let library = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","-","_","0","1","2","3","4","5","6","7","8","9"];
           let ans = e.every(function(z){
@@ -534,13 +551,13 @@
             return false;
           }
         }
-        //Primary function/action that builds the playlist every time it is called.
+        //Primary function/action that builds the playlist every time it is called. Expects an array of strings, each containing a YouTube video URL of some sort.
         function generate(e){
-          //Ensure that the YouTube iFrame element is displayed properly, which is hidden by default and when the "Reset" button is pressed.
+          //Ensure that the YouTube iFrame element is displayed properly, which is hidden both by default and when the "Reset" button is pressed.
           videoBox.style.display = "block";
           //A for loop that adds each properly submitted YouTube video URL to the playlist.
           for (let i = 0; i < e.length; i++) {
-            //The URL must meet certain criteria for being added, such as not being a YT playlist, search query or search result.
+            //The URL must meet certain criteria for being added, such as not being an empty string, YT playlist homepage, search query and/or search result.
             if (e[i] !== "" && !e[i].includes("playlist") && !e[i].includes("search_query") && !e[i].includes("results") && Boolean(squeeze(e[i])) == true) {
               //This pushBox variable is the primary variable used throughout each for loop pass to represent the relevant playlist item.
               let pushBox = document.createElement("div");
@@ -597,15 +614,6 @@
               }
               //Giving the pushBox div an id, which is used to identify each playlist item whenever accessed.
               pushBox.id = (id++).toString();
-              //Ensuring that the YouTube URL ID associated with the first element of the tracker array is displayed.
-              let pushBoxes = document.querySelectorAll(".pushBox")
-              for (let t of tracker) {
-                if (t.active === true) {
-                  videoBox.src = `https://www.youtube.com/embed/${t.yT}`;
-                  videoBox.height = "314px";
-                  pushBoxes[t.pushBox].style.border = "1px solid gold";
-                }
-              }
               //Creating and publishing the playlist position number for this particular pushBox div.
               let playlistPosition = document.createElement("p");
               playlistPosition.classList.add("playlistPosition");
@@ -652,19 +660,28 @@
               currentlyViewing.innerText = updatecurrentlyViewing();
             }
           }
+          //Ensuring that the YouTube URL ID associated with the currently active element of the tracker array is displayed.
+          let pushBoxes = document.querySelectorAll(".pushBox")
+          for (let t of tracker) {
+            if (t.active === true) {
+              videoBox.src = `https://www.youtube.com/embed/${t.yT}`;
+              videoBox.height = "314px";
+              pushBoxes[t.pushBox].style.border = "1px solid gold";
+            }
+          }
         }
-        //The "Submit" button's click event listener adds new videos or elements to the existing/displayed playlist.
+        //The "Submit" button's click event listener adds new videos/elements to the already existing/displayed playlist, including empty and unsaved playlists.
         submitButton.addEventListener("click",function(){
           let userInput = inputField.value.split(",");
           generate(userInput);
         });
-        //The "Reset" button's click event listener is specifically intended to call the "resetting()" function.
+        //The "Reset" button's click event listener is specifically intended to call the "resetting()" function, as well as returning other features to their freshly/first loaded condition(s).
         reset.addEventListener("click",function(){
           resetting();
           loadedPlaylistInfo.style.display = "none";
           currentlyViewing.innerText = "0/0";
         });
-        //The "Save" button's click event listener, which saves a small JSON file to the user's browser, intended to be access by the user at a later time.
+        //The "Save" button's click event listener, which adds a small JSON file to the user's browser intended to be accessed and updated by the user at a later time.
         save.addEventListener("click",function(){
           let name;
           let zeURLs;
@@ -709,7 +726,7 @@
             }
           }
         });
-        //The "Load" button's click event listener first clears and then populates the playlist body, based on whatever URL were initially saved (as a JSON file) by the user.
+        //The "Load" button's click event listener first creates a popup containing the titles/ids of each previously saved playlist, thereby prompting the user to either select a playlist or close the popup altogether. Once selected, this particular event listener then (re-)populates the playlist with pushBox divs, intended to be used as the primary interface for loading saved videos.
         load.addEventListener("click",function(){
           if (popUpActive == 0) {
             ++popUpActive;
@@ -821,7 +838,7 @@
             currentlyViewing.innerText = updatecurrentlyViewing();
           }
         });
-        //The "Shfl" button's click event listener randomly reorders playlist elements, via a sort method on the tracker variable.
+        //The "Shfl" button's click event listener randomly reorders playlist elements, via a sort method on the main tracker variable.
         shuffle.addEventListener("click",function(){
           if (tracker.length > 0) {
             let sortedTracker = tracker.sort(function(a,b){
@@ -840,6 +857,7 @@
               let temp = "https://www.youtube.com/watch?v=" + t.yT;
               finalTracker.push(temp);
             }
+            videoBox.style.display = "block";
             generate(finalTracker);
           }
         });
@@ -855,7 +873,7 @@
             displayValue = 0;
           }
         });
-        //Saving the order and number of videos for an already loaded playlist.
+        //Saving the order and number of videos for an already loaded playlist without being forced to re-enter the exact title.
         loadedPlaylistSave.addEventListener("click",function(){
           let name = loadedPlaylistTitle.textContent;
           let zeURLs = [{id:name}];
@@ -882,27 +900,31 @@
             }
           }
         });
-        //Changing the lightness of the widget's primary color.
+        //Changing the lightness/darkness of the widget's primary CSS properties.
         lightDarkSlider.addEventListener("input",function(){
           let v = this.value;
           bod.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
           controls.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
           header.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
+          footer.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
           extras.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
           h1.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
           h1.style.color = "rgb(" + (255 - v) + "," + (255 - v) + "," + (255 - v) + ")";
+          footerText.style.color = "rgb(" + (255 - v) + "," + (255 - v) + "," + (255 - v) + ")";
+          builtBy.style.color = "rgb(" + (255 - v) + "," + (255 - v) + "," + (255 - v) + ")";
         });
         //Making sure the Drag and Drop feature is limited to the controls div.
         controls.addEventListener("dragover",function(e){
           e.preventDefault();
         });
-        //Event listener for the resizing of the window/viewport.
+        //Event listener for the resizing of the window/viewport. Currently makes sure that the load popup/UI remains in the center of the screen if the size of the browser is changed.
         window.addEventListener("resize",function(){
           let innerWidth = window.innerWidth;
           popUp.style.left = ((innerWidth / 2) - 100) + "px";
         });
         //////////////////////////////////Feature Comments Start
         //Make the Drag and Drop interface smarter, and mobile/touch friendly. Is that possible?
+        //Create a means for editing individual playlist titles, after being initially saved/loaded.
         //Determine whether or not an autoplay feature is possible.
         //Update the Instructions text to more accurately reflect new features, such as how to (re-)save and load playlists.
         //Update the JS comments to be even more accurate and robust.
@@ -912,7 +934,7 @@
         //Should the resetting() and generate() functions be used in tandem so often?
         //////////////////////////////////Code Comments End
         //////////////////////////////////Bug Comments Start
-        //Bug #1 - When shuffling and deleting videos, too often the YouTube embed/display does not load properly; displaying only the black background of the #frame DIV. This bug is, at this point, a mystery. But it too shall be resolved.
+        //Bug #1 - When shuffling and deleting videos, too often the YouTube embed/display does not load properly; displaying only the black background of the #frame DIV. This bug is, at this point, a mystery. But it too shall be resolved. [Open]
         //////////////////////////////////Bug Comments End
       }
       main();
