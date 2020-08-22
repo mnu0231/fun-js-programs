@@ -21,7 +21,7 @@
         text-align: center;
         background: black;
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
         align-items: center;
         justify-content: space-around;
       }
@@ -82,7 +82,7 @@
       }
       .pushBox:hover {
         cursor: pointer;
-        box-shadow: inset 0px 0px 3px 2px lightgray;
+        box-shadow: inset 0px 0px 3px 1px lightgray;
       }
       .turnedOn {
         opacity: .05;
@@ -154,8 +154,8 @@
         padding: 1px;
         width: 15px;
         text-align: center;
-        margin-left: -10px;
-        margin-top: -12px;
+        margin-left: -13px;
+        margin-top: -13px;
       }
       .deletePopUp:hover {
         background-color: red;
@@ -196,7 +196,7 @@
       }
       #currentlyViewing {
         padding: 0px;
-        width: 48%;
+        width: 49%;
         text-align: center;
       }
       #controls {
@@ -226,8 +226,9 @@
         border: none;
       }
       #lightDarkSlider {
-        margin-top: 0px;
+        margin-top: 15px;
         margin-bottom: 15px;
+        margin-right: 0px;
         border: none;
         width: 150px;
       }
@@ -278,10 +279,10 @@
           border: none;
         }
         input {
-          width: 119px;
+          width: 99%;
           margin-left: 0px;
           margin-right: 0px;
-          margin-top: 5px;
+          margin-top: 0px;
           border: 1px solid black;
         }
         .pushBox {
@@ -333,7 +334,7 @@
           margin-right: 0px;
           margin-top: 0px;
           margin-bottom: 0px;
-          width: 48%;
+          width: 49%;
         }
         #loadSaveDIV, #submitResetDIV, #prevNextDIV, #currentlyViewingDIV {
           width: 100%;
@@ -342,7 +343,7 @@
           justify-content: space-around;
         }
         #currentlyViewingDIV {
-          margin-bottom: 5px;
+          margin-bottom: 0px;
         }
         #controls {
           height: 180px;
@@ -395,7 +396,7 @@
             <div id="controls"></div>
           </nav>
           <div id="frame">
-            <iframe width="100%" height="0" src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe width="100%" height="314" src="" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
           </div>
         </div>
       </section>
@@ -407,7 +408,7 @@
         <div id="instructions">
           <h2>Instructions</h2>
           <button id="instButton">Hide</button>
-          <p>Add a comma separated list of YouTube video URLs into the text box, and press the <b>Submit</b> button to have your playlist generated. You can also preserve your playlist by pressing the <b>Save</b> button, which uploads a JSON file to your browser's local storage. That same JSON file can then be later accessed by pressing the <b>Load</b> button.</p>
+          <p>Add a comma separated list of YouTube video URLs into the text box, and press the <b>Submit</b> button to have your playlist generated. You can preserve your playlist (with an associated title) by pressing the <b>Save</b> button. And later access it by pressing the <b>Load</b> button, then making your selection from among those already saved.</p>
         </div>
       </section>
     </main>
@@ -418,8 +419,8 @@
       </nav>
     </header>
     <footer>
-      <p>This project is for demonstration purposes only, and the developer does not claim any intellectual property herein. The word "YouTube" is owned by Google. Thus, there is no license associated with this program, nor is there any guarantee of performance.</p>
-      <p id="builtBy">Built By: Bret Bernhoft</p>
+      <p><b>Dislcaimer:</b> This project is for demonstration purposes only, and the Developer does not claim any intellectual property herein. The word "YouTube" (as a noun, verb and/or adjective) is owned by Google/Alphabet. Thus there is no license for use, no guarantee of performance and/or no ownership associated with this program. Please use responsibly.</p>
+      <p id="builtBy"><b>Built By:</b> Bret Bernhoft</p>
     </footer>
     <script>
       function main() {
@@ -557,11 +558,13 @@
           videoBox.style.display = "block";
           //A for loop that adds each properly submitted YouTube video URL to the playlist.
           for (let i = 0; i < e.length; i++) {
+            //Passing the (e[i]) URL through the main filtering function, and assigning it to the "squeezed" variable.
+            let squeezed = squeeze(e[i]);
             //The URL must meet certain criteria for being added, such as not being an empty string, YT playlist homepage, search query and/or search result.
-            if (e[i] !== "" && !e[i].includes("playlist") && !e[i].includes("search_query") && !e[i].includes("results") && Boolean(squeeze(e[i])) == true) {
+            if (e[i] !== "" && !e[i].includes("playlist") && !e[i].includes("search_query") && !e[i].includes("results") && Boolean(squeezed) == true) {
               //This pushBox variable is the primary variable used throughout each for loop pass to represent the relevant playlist item.
               let pushBox = document.createElement("div");
-              //Drag And Drop interface code.
+              //Drag And Drop interface code for the pushBox div.
               pushBox.setAttribute("draggable","true");
               pushBox.addEventListener("dragstart",function(e){
                 e.dataTransfer.setData("Text",pushBox.id)
@@ -596,21 +599,21 @@
               let rN3 = Math.floor(Math.random() * 256);
               pushBox.style.backgroundColor = "rgb(" + rN1 + "," + rN2 + "," + rN3 + ")";
               //Accessing the YT preview thumbnail and setting it as the background image for the relevant pushBox div.
-              pushBox.style.backgroundImage = "url('http://img.youtube.com/vi/" + squeeze(e[i]) + "/0.jpg')";
+              pushBox.style.backgroundImage = "url('http://img.youtube.com/vi/" + squeezed + "/0.jpg')";
               //Capturing the YT video ID and preventing the relevant P element from being displayed.
               let tempP = document.createElement("p");
               tempP.classList.add("tempP");
               tempP.style.display = "none";
-              let tempTextNode = document.createTextNode(squeeze(e[i]));
+              let tempTextNode = document.createTextNode(squeezed);
               tempP.appendChild(tempTextNode);
               pushBox.appendChild(tempP);
               //Adding the pushBox div to the playlist interface.
               controls.appendChild(pushBox);
               //Populating the tracker array with information about this particular pushBox div.
               if (tracker.length == 0) {
-                tracker.push({active:true,pushBox:id.toString(),yT:squeeze(e[i])});
+                tracker.push({active:true,pushBox:id.toString(),yT:squeezed});
               } else {
-                tracker.push({active:false,pushBox:id.toString(),yT:squeeze(e[i])});
+                tracker.push({active:false,pushBox:id.toString(),yT:squeezed});
               }
               //Giving the pushBox div an id, which is used to identify each playlist item whenever accessed.
               pushBox.id = (id++).toString();
@@ -665,7 +668,6 @@
           for (let t of tracker) {
             if (t.active === true) {
               videoBox.src = `https://www.youtube.com/embed/${t.yT}`;
-              videoBox.height = "314px";
               pushBoxes[t.pushBox].style.border = "1px solid gold";
             }
           }
@@ -681,7 +683,7 @@
           loadedPlaylistInfo.style.display = "none";
           currentlyViewing.innerText = "0/0";
         });
-        //The "Save" button's click event listener, which adds a small JSON file to the user's browser intended to be accessed and updated by the user at a later time.
+        //The "Save" button's click event listener adds a small JSON file to the user's browser intended to be accessed and updated by the user at a later time.
         save.addEventListener("click",function(){
           let name;
           let zeURLs;
@@ -726,7 +728,7 @@
             }
           }
         });
-        //The "Load" button's click event listener first creates a popup containing the titles/ids of each previously saved playlist, thereby prompting the user to either select a playlist or close the popup altogether. Once selected, this particular event listener then (re-)populates the playlist with pushBox divs, intended to be used as the primary interface for loading saved videos.
+        //The "Load" button's click event listener first creates a popup containing the titles/ids of each previously saved playlist, thereby prompting the user to either select a playlist or close the popup altogether. Once selected, this particular event listener then (re-)populates the playlist (or #controls div) with pushBox divs, intended to be used as the primary interface for loading saved videos.
         load.addEventListener("click",function(){
           if (popUpActive == 0) {
             ++popUpActive;
@@ -838,7 +840,7 @@
             currentlyViewing.innerText = updatecurrentlyViewing();
           }
         });
-        //The "Shfl" button's click event listener randomly reorders playlist elements, via a sort method on the main tracker variable.
+        //The "Shfl" button's click event listener randomly reorders playlist elements, via a sort method on the main "tracker" variable.
         shuffle.addEventListener("click",function(){
           if (tracker.length > 0) {
             let sortedTracker = tracker.sort(function(a,b){
@@ -861,7 +863,7 @@
             generate(finalTracker);
           }
         });
-        //The "Display" button's click event listener. This button is associated with displaying and hiding the "Instructions" H2 and P elements.
+        //The "Display" button's click event listener. This button is associated with displaying and hiding the "Instructions" paragraph element.
         instButton.addEventListener("click",function(){
           if (displayValue == 0) {
             instP.style.display = "none";
@@ -873,7 +875,7 @@
             displayValue = 0;
           }
         });
-        //Saving the order and number of videos for an already loaded playlist without being forced to re-enter the exact title.
+        //Saving the order and number of videos for an already saved/loaded playlist without being forced to re-enter the same title.
         loadedPlaylistSave.addEventListener("click",function(){
           let name = loadedPlaylistTitle.textContent;
           let zeURLs = [{id:name}];
@@ -886,6 +888,9 @@
           let secure = [];
           for (let b = 0; b < p.length; b++) {
             secure.push(p[b][0].id)
+          }
+          if (secure.every(function(a){return a != name;})) {
+            secure.push(name);
           }
           for (let s in secure) {
             if (secure[s] == name) {
@@ -922,19 +927,17 @@
           let innerWidth = window.innerWidth;
           popUp.style.left = ((innerWidth / 2) - 100) + "px";
         });
-        //////////////////////////////////Feature Comments Start
-        //Make the Drag and Drop interface smarter, and mobile/touch friendly. Is that possible?
+        //////////////////////////////////Version 2.0 Feature Comments Start
+        //Make the Drag and Drop interface smarter, and mobile/touch friendly.
         //Create a means for editing individual playlist titles, after being initially saved/loaded.
         //Determine whether or not an autoplay feature is possible.
-        //Update the Instructions text to more accurately reflect new features, such as how to (re-)save and load playlists.
-        //Update the JS comments to be even more accurate and robust.
-        //////////////////////////////////Feature Comments End
+        //////////////////////////////////Version 2.0 Feature Comments End
         //////////////////////////////////Code Comments Start
         //This program (especially its functions) can be reduced in size, and will be.
         //Should the resetting() and generate() functions be used in tandem so often?
         //////////////////////////////////Code Comments End
         //////////////////////////////////Bug Comments Start
-        //Bug #1 - When shuffling and deleting videos, too often the YouTube embed/display does not load properly; displaying only the black background of the #frame DIV. This bug is, at this point, a mystery. But it too shall be resolved. [Open]
+        //Bug #1 - When shuffling, loading and deleting videos, too often the YouTube embed/display does not load properly; displaying only the black or white background of the #frame DIV. This bug is, at this point, a mystery. But it too shall be resolved. [Open]
         //////////////////////////////////Bug Comments End
       }
       main();
