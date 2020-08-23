@@ -152,9 +152,9 @@
       .deletePopUp {
         font-size: 12px;
         padding: 1px;
-        width: 15px;
+        width: 12px;
         text-align: center;
-        margin-left: -13px;
+        margin-left: -11px;
         margin-top: -13px;
       }
       .deletePopUp:hover {
@@ -169,7 +169,7 @@
       }
       #frame {
         width: 100%;
-        border: 1px solid darkgray;
+        border: none;
       }
       #submissions {
         display: flex;
@@ -185,6 +185,7 @@
         margin-right: 5px;
         margin-top: 5px;
         margin-bottom: 5px;
+        width: 58px;
       }
       #loadSaveDIV, #submitResetDIV, #prevNextDIV, #currentlyViewingDIV {
         display: flex;
@@ -196,7 +197,7 @@
       }
       #currentlyViewing {
         padding: 0px;
-        width: 49%;
+        width: 58px;
         text-align: center;
       }
       #controls {
@@ -246,7 +247,7 @@
         margin-right: 10px;
       }
       #builtBy {
-        margin: 10px 0px 20px 0px;
+        margin: 10px 0px 10px 0px;
       }
       @media screen and (min-width: 700px) {
         header {
@@ -279,10 +280,11 @@
           border: none;
         }
         input {
-          width: 99%;
+          width: 119px;
           margin-left: 0px;
           margin-right: 0px;
-          margin-top: 0px;
+          margin-top: 3px;
+          margin-bottom: 3px;
           border: 1px solid black;
         }
         .pushBox {
@@ -317,24 +319,25 @@
           height: 316px;
           border-top: 1px solid darkgray;
           border-bottom: 1px solid darkgray;
+          border-right: 1px solid darkgray;
           border-left: none;
         }
         #submissions {
-          height: 134px;
           display: flex;
           flex-direction: column;
           align-items: space-around;
-          justify-content: space-around;
+          justify-content: flex-start;
           border: 1px solid white;
           background-color: white;
           flex-wrap: nowrap;
           padding: 0px;
+          padding-bottom: 1px;
         }
         #submissions button {
           margin-right: 0px;
           margin-top: 0px;
-          margin-bottom: 0px;
-          width: 49%;
+          margin-bottom: 3px;
+          width: 58px;
         }
         #loadSaveDIV, #submitResetDIV, #prevNextDIV, #currentlyViewingDIV {
           width: 100%;
@@ -346,7 +349,7 @@
           margin-bottom: 0px;
         }
         #controls {
-          height: 180px;
+          height: 187px;
           overflow: scroll;
           display: flex;
           flex-direction: column;
@@ -365,6 +368,9 @@
         #lightDarkSlider {
           margin-top: 12px;
           border: none;
+        }
+        #builtBy {
+          margin: 10px 0px 20px 0px;
         }
       }
     </style>
@@ -930,6 +936,8 @@
         //////////////////////////////////Version 2.0 Feature Comments Start
         //Make the Drag and Drop interface smarter, and mobile/touch friendly.
         //Create a means for editing individual playlist titles, after being initially saved/loaded.
+        //Playlist exporting/uploading via specially formatted strings.
+        //Social sharing options.
         //Determine whether or not an autoplay feature is possible.
         //////////////////////////////////Version 2.0 Feature Comments End
         //////////////////////////////////Code Comments Start
