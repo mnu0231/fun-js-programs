@@ -44,11 +44,10 @@
         color: white;
         border: none;
         background: black;
-        text-shadow: 2px 2px rgba(3,248,252,0.53), -2px -2px rgba(252,3,215,0.53);
-        margin-bottom: 15px;
+        text-shadow: 1px 1px rgba(3,248,252,0.53), -1px -1px rgba(252,3,215,0.53), 1px -1px rgba(21,255,0,0.53), -1px 1px rgba(238,255,0,0.53);
+        margin-bottom: 0px;
       }
       h2 {
-        margin-bottom: 5px;
         color: black;
         display: inline-block;
       }
@@ -171,6 +170,9 @@
         width: 100%;
         border: none;
       }
+      #frame iframe {
+        display: none;
+      }
       #submissions {
         display: flex;
         flex-direction: row;
@@ -210,9 +212,15 @@
       #extras {
         padding: 7px 10px;
       }
+      #instHeader {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
       #instructions {
         width: 100%;
         border: 1px solid white;
+        margin-top: 3px;
         padding: 5px 10px 10px 10px;
         background: white;
       }
@@ -221,6 +229,7 @@
       }
       #instButton {
         margin: 0px 0px 0px 10px;
+        width: 58px;
       }
       #bottomNav {
         width: 100%;
@@ -244,10 +253,17 @@
         justify-content: flex-end;
       }
       #loadedPlaylistSave {
+        width: 58px;
         margin-right: 10px;
       }
-      #builtBy {
+      #builtBy, #versionPublication {
         margin: 10px 0px 10px 0px;
+      }
+      #builtBy a {
+        color: aqua;
+      }
+      #builtBy a:hover {
+        color: magenta;
       }
       @media screen and (min-width: 700px) {
         header {
@@ -275,7 +291,7 @@
           margin: 0px auto;
         }
         h1 {
-          margin-bottom: 20px;
+          margin-bottom: 0px;
           width: 75%;
           border: none;
         }
@@ -321,6 +337,9 @@
           border-bottom: 1px solid darkgray;
           border-right: 1px solid darkgray;
           border-left: none;
+        }
+        #frame iframe {
+          display: block;
         }
         #submissions {
           display: flex;
@@ -381,7 +400,7 @@
         <div id="shell">
           <nav>
             <div id="submissions">
-              <input placeholder="URLs here">
+              <input placeholder="Enter URLs here">
               <div id="submitResetDIV">
                 <button id="submit">Submit</button>
                 <button id="reset">Reset</button>
@@ -412,8 +431,10 @@
           <p><b>Playlist Title:</b> <span id="loadedPlaylistTitle"></span></p>
         </div>
         <div id="instructions">
-          <h2>Instructions</h2>
-          <button id="instButton">Hide</button>
+          <div id="instHeader">
+            <h2>Instructions</h2>
+            <button id="instButton">Hide</button>
+          </div>
           <p>Add a comma separated list of YouTube video URLs into the text box, and press the <b>Submit</b> button to have your playlist generated. You can preserve your playlist (with an associated title) by pressing the <b>Save</b> button. And later access it by pressing the <b>Load</b> button, then making your selection from among those already saved.</p>
         </div>
       </section>
@@ -426,7 +447,8 @@
     </header>
     <footer>
       <p><b>Dislcaimer:</b> This project is for demonstration purposes only, and the Developer does not claim any intellectual property herein. The word "YouTube" (as a noun, verb and/or adjective) is owned by Google/Alphabet. Thus there is no license for use, no guarantee of performance and/or no ownership associated with this program. Please use responsibly.</p>
-      <p id="builtBy"><b>Built By:</b> Bret Bernhoft</p>
+      <p id="versionPublication">(<b>Version 1.0</b>) <b>Published On:</b> 8/23/2020</p>
+      <p id="builtBy"><b>Built By:</b> <a href="https://github.com/bretbernhoftcodes" target="_blank">Bret Bernhoft</a></p>
     </footer>
     <script>
       function main() {
@@ -435,6 +457,7 @@
         let header = document.querySelector("header");
         let footer = document.querySelector("footer");
         let footerText = document.querySelector("footer p");
+        let versionPublication = document.querySelector("#versionPublication");
         let builtBy = document.querySelector("#builtBy");
         let h1 = document.querySelector("h1");
         let frame = document.querySelector("#frame");
@@ -470,7 +493,7 @@
         function initialConditions(){
           videoBox.style.display = "none";
         }
-        initialConditions();
+        //initialConditions();
         //Resets the entire YouTube Playlist Maker back to fresh or brand new, as if the user has only just arrived.
         function resetting(){
           //Does not change/reset the background color to its original condition(s); the value of which can be manipulated via a slider in the UI.
@@ -479,7 +502,7 @@
           inputField.value = "";
           tracker = [];
           id = 0;
-          initialConditions();
+          //initialConditions();
         }
         //Responsible for updating the playlist locator and length display(s) text.
         function updatecurrentlyViewing(){
@@ -686,6 +709,7 @@
         //The "Reset" button's click event listener is specifically intended to call the "resetting()" function, as well as returning other features to their freshly/first loaded condition(s).
         reset.addEventListener("click",function(){
           resetting();
+          videoBox.style.display = "none";
           loadedPlaylistInfo.style.display = "none";
           currentlyViewing.innerText = "0/0";
         });
@@ -922,6 +946,7 @@
           h1.style.backgroundColor = "rgb(" + v + "," + v + "," + v + ")";
           h1.style.color = "rgb(" + (255 - v) + "," + (255 - v) + "," + (255 - v) + ")";
           footerText.style.color = "rgb(" + (255 - v) + "," + (255 - v) + "," + (255 - v) + ")";
+          versionPublication.style.color = "rgb(" + (255 - v) + "," + (255 - v) + "," + (255 - v) + ")";
           builtBy.style.color = "rgb(" + (255 - v) + "," + (255 - v) + "," + (255 - v) + ")";
         });
         //Making sure the Drag and Drop feature is limited to the controls div.
@@ -933,20 +958,6 @@
           let innerWidth = window.innerWidth;
           popUp.style.left = ((innerWidth / 2) - 100) + "px";
         });
-        //////////////////////////////////Version 2.0 Feature Comments Start
-        //Make the Drag and Drop interface smarter, and mobile/touch friendly.
-        //Create a means for editing individual playlist titles, after being initially saved/loaded.
-        //Playlist exporting/uploading via specially formatted strings.
-        //Social sharing options.
-        //Determine whether or not an autoplay feature is possible.
-        //////////////////////////////////Version 2.0 Feature Comments End
-        //////////////////////////////////Code Comments Start
-        //This program (especially its functions) can be reduced in size, and will be.
-        //Should the resetting() and generate() functions be used in tandem so often?
-        //////////////////////////////////Code Comments End
-        //////////////////////////////////Bug Comments Start
-        //Bug #1 - When shuffling, loading and deleting videos, too often the YouTube embed/display does not load properly; displaying only the black or white background of the #frame DIV. This bug is, at this point, a mystery. But it too shall be resolved. [Open]
-        //////////////////////////////////Bug Comments End
       }
       main();
     </script>
