@@ -246,18 +246,36 @@
         display: none;
         background-color: white;
         width: 100%;
-        padding: 10px;
+        padding: 0px 0px 10px 10px;
         margin-top: 3px;
         margin-bottom: 10px;
         align-items: center;
         justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+      #loadedPlaylistInfo p {
+        margin-top: 10px;
+        font-size: 14px;
+        margin-right: 10px;
+        text-align: right;
       }
       #loadedPlaylistSave {
         width: 58px;
         margin-right: 10px;
+        margin-top: 10px;
+      }
+      #loadedPlaylistTitle {
+        border: 1px solid lightgray;
+        padding: 0px 3px;
+      }
+      #footerSubTextDIV {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content:space-around;
       }
       #builtBy, #versionPublication {
-        margin: 10px 0px 10px 0px;
+        margin: 10px 5px 10px 5px;
       }
       #builtBy a {
         color: aqua;
@@ -379,6 +397,12 @@
         #currentlyViewing {
           padding-top: 0px;
         }
+        #loadedPlaylistInfo {
+          padding: 0px 0px 10px 10px;
+        }
+        #loadedPlaylistTitle {
+          margin-right: 0px;
+        }
         #bottomNav {
           height: 100%;
           width: 200px;
@@ -389,7 +413,7 @@
           border: none;
         }
         #builtBy {
-          margin: 10px 0px 20px 0px;
+          margin: 10px 0px 10px 0px;
         }
       }
     </style>
@@ -428,7 +452,8 @@
       <section id="extras">
         <div id="loadedPlaylistInfo">
           <button id="loadedPlaylistSave">Save</button>
-          <p><b>Playlist Title:</b> <span id="loadedPlaylistTitle"></span></p>
+          <p><b>Last Updated:</b> <span id="loadedPlaylistUpdate"></span></p>
+          <p><b>Playlist Title:</b> <span id="loadedPlaylistTitle" contenteditable="true"></span></p>
         </div>
         <div id="instructions">
           <div id="instHeader">
@@ -447,8 +472,10 @@
     </header>
     <footer>
       <p><b>Dislcaimer:</b> This project is for demonstration purposes only, and the Developer does not claim any intellectual property herein. The word "YouTube" (as a noun, verb and/or adjective) is owned by Google/Alphabet. Thus there is no license for use, no guarantee of performance and/or no ownership associated with this program. Please use responsibly.</p>
-      <p id="versionPublication">(<b>Version 1.0</b>) <b>Published On:</b> 8/23/2020</p>
-      <p id="builtBy"><b>Built By:</b> <a href="https://github.com/bretbernhoftcodes" target="_blank">Bret Bernhoft</a></p>
+      <div id="footerSubTextDIV">
+        <p id="versionPublication">(<b>Version 1.1</b>) <b>Published On:</b> 8/24/2020</p>
+        <p id="builtBy"><b>Built By:</b> <a href="https://github.com/bretbernhoftcodes" target="_blank">Bret Bernhoft</a></p>
+      </div>
     </footer>
     <script>
       function main() {
@@ -481,6 +508,7 @@
         let loadedPlaylistInfo = document.querySelector("#loadedPlaylistInfo");
         let loadedPlaylistSave = document.querySelector("#loadedPlaylistSave");
         let loadedPlaylistTitle = document.querySelector("#loadedPlaylistTitle");
+        let loadedPlaylistUpdate = document.querySelector("#loadedPlaylistUpdate");
         //Load interface variables.
         let popUp;
         let popUpActive = 0;
@@ -489,11 +517,7 @@
         //Helper or secondary variables.
         let id = 0;
         let displayValue = 0;
-        //Specific CSS conditions to both organize/isolate and make callable.
-        function initialConditions(){
-          videoBox.style.display = "none";
-        }
-        //initialConditions();
+        let nameMaster;
         //Resets the entire YouTube Playlist Maker back to fresh or brand new, as if the user has only just arrived.
         function resetting(){
           //Does not change/reset the background color to its original condition(s); the value of which can be manipulated via a slider in the UI.
@@ -502,7 +526,6 @@
           inputField.value = "";
           tracker = [];
           id = 0;
-          //initialConditions();
         }
         //Responsible for updating the playlist locator and length display(s) text.
         function updatecurrentlyViewing(){
@@ -583,8 +606,6 @@
         }
         //Primary function/action that builds the playlist every time it is called. Expects an array of strings, each containing a YouTube video URL of some sort.
         function generate(e){
-          //Ensure that the YouTube iFrame element is displayed properly, which is hidden both by default and when the "Reset" button is pressed.
-          videoBox.style.display = "block";
           //A for loop that adds each properly submitted YouTube video URL to the playlist.
           for (let i = 0; i < e.length; i++) {
             //Passing the (e[i]) URL through the main filtering function, and assigning it to the "squeezed" variable.
@@ -696,6 +717,8 @@
           let pushBoxes = document.querySelectorAll(".pushBox")
           for (let t of tracker) {
             if (t.active === true) {
+              //Ensure that the YouTube iFrame element is displayed properly, which is hidden both by default and when the "Reset" button is pressed.
+              videoBox.style.display = "block";
               videoBox.src = `https://www.youtube.com/embed/${t.yT}`;
               pushBoxes[t.pushBox].style.border = "1px solid gold";
             }
@@ -713,18 +736,26 @@
           loadedPlaylistInfo.style.display = "none";
           currentlyViewing.innerText = "0/0";
         });
-        //The "Save" button's click event listener adds a small JSON file to the user's browser intended to be accessed and updated by the user at a later time.
+        //The "Save As" button's click event listener adds a small JSON file to the user's browser intended to be accessed and updated by the user at a later time.
         save.addEventListener("click",function(){
           let name;
           let zeURLs;
+          let lastDate
           let conCh = controls.children;
           if (conCh.length > 0) {
+            //Setting the title of the playlist.
             name = prompt("What is the title of your playlist?");
-            zeURLs = [{id:name}];
+            nameMaster = name;
+            //Setting the time of the save.
+            let d = new Date();
+            lastDate = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+            zeURLs = [{id:name},{update:lastDate}];
+            loadedPlaylistUpdate.textContent = lastDate;
             for (let c of conCh) {
               zeURLs.push("https://www.youtube.com/watch?v=" + c.firstElementChild.textContent);
             }
           }
+          //Makes sure there is a "master" object in the user's local storage.
           if (localStorage.length < 1) {
             localStorage.setItem("master",JSON.stringify([]));
           }
@@ -736,61 +767,72 @@
           }
           if (secure.every(function(e){return e != name})) {
             p.push(zeURLs);
-            if (name) {
-              localStorage.setItem("master",JSON.stringify(p));
-              loadedPlaylistInfo.style.display = "flex";
-              loadedPlaylistTitle.textContent = name;
-            }
+            localStorage.setItem("master",JSON.stringify(p));
+            loadedPlaylistInfo.style.display = "flex";
+            loadedPlaylistTitle.textContent = name;
           } else if (secure.some(function(e){return e == name})) {
             for (let s in secure) {
               if (secure[s] == name) {
-                p[s] = [{id:name}];
+                p[s] = [{id:name},{update:lastDate}];
                 let conCh2 = controls.children;
                 if (conCh2.length > 0) {
                   for (let c of conCh2) {
                     p[s].push("https://www.youtube.com/watch?v=" + c.firstElementChild.textContent);
                   }
                 }
-                localStorage.setItem("master",JSON.stringify(p));
                 loadedPlaylistInfo.style.display = "flex";
                 loadedPlaylistTitle.textContent = name;
               }
             }
+            localStorage.setItem("master",JSON.stringify(p));
           }
         });
         //The "Load" button's click event listener first creates a popup containing the titles/ids of each previously saved playlist, thereby prompting the user to either select a playlist or close the popup altogether. Once selected, this particular event listener then (re-)populates the playlist (or #controls div) with pushBox divs, intended to be used as the primary interface for loading saved videos.
         load.addEventListener("click",function(){
           if (popUpActive == 0) {
+            //Ths first line of code prevents the popup from being displayed twice at the same time.
             ++popUpActive;
+            //Creating the popup div element.
             popUp = document.createElement("div");
+            //Creating the div element (located in the top left corner) that immediately closes the popup when pressed.
             let deletePopUp = document.createElement("div");
             deletePopUp.classList.add("deletePopUp");
             let deletePopUpX = document.createTextNode("x");
             deletePopUp.appendChild(deletePopUpX);
+            //Adding the event listener to the "popup close" div element.
             deletePopUp.addEventListener("click",function(){
               popUpActive = 0;
               bod.removeChild(popUp);
             });
             popUp.appendChild(deletePopUp);
             popUp.classList.add("popUp");
+            //Makes sure there is a "master" object in the user's local storage.
             if (localStorage.length < 1) {
               localStorage.setItem("master",JSON.stringify([]));
             }
+            //Calling and parsing the "master" object from the user's local storage.
             let o = localStorage.getItem("master");
             let p = JSON.parse(o);
+            //Pulling out each playlist's id/name and pushing it into the names array variable.
             let names = [];
             for (let i = 0; i < p.length; i++) {
               names.push(p[i][0].id);
             }
+            //Looping over each of the titles/ids in the names variable.
             for (let n of names) {
               let innerDIV = document.createElement("div");
+              //Creating the containing div element for this particular playlist title.
               innerDIV.classList.add("innerDIVLoad");
               popUp.appendChild(innerDIV);
+              //Capturing and displaying each playlist's title.
               let tempP = document.createElement("p");
               tempP.classList.add("playlistTitle");
+              //Adding a click event listener to each relevant title, that loads/generates the appropriate playlist.
               tempP.addEventListener("click",function(){
+                //Remove the popup and make it available for being reopened.
                 popUpActive = 0;
                 bod.removeChild(popUp);
+                //Processing the URL data stored (in local storage) with the relevant playlist.
                 let o = localStorage.getItem("master");
                 let p = JSON.parse(o);
                 let urlData = [];
@@ -798,17 +840,22 @@
                   if (p[z][0].id == n) {
                     loadedPlaylistInfo.style.display = "flex";
                     loadedPlaylistTitle.textContent = n;
-                    for (let i = 1; i < p[z].length; i++) {
+                    nameMaster = n;
+                    loadedPlaylistUpdate.textContent = p[z][1].update;
+                    for (let i = 2; i < p[z].length; i++) {
                       urlData.push(p[z][i]);
                     }
                   }
                 }
+                //Clearing and then populating the playlist with the correct videos.
                 resetting();
                 generate(urlData);
               });
+              //Adding the playlist title to the the containing div element.
               let tempTextNode = document.createTextNode(n);
               tempP.appendChild(tempTextNode);
               innerDIV.appendChild(tempP);
+              //Creating the option to delete individual playlists after pressing the "Load" button.
               let deletion = document.createElement("p");
               deletion.classList.add("deletion");
               let deletionX = document.createTextNode("X");
@@ -829,6 +876,7 @@
                 localStorage.setItem("master",JSON.stringify(newMaster));
               });
             }
+            //Centers the popup in the middle of the user's screen.
             let innerWidth = window.innerWidth;
             popUp.style.left = ((innerWidth / 2) - 100) + "px";
             bod.appendChild(popUp);
@@ -889,7 +937,6 @@
               let temp = "https://www.youtube.com/watch?v=" + t.yT;
               finalTracker.push(temp);
             }
-            videoBox.style.display = "block";
             generate(finalTracker);
           }
         });
@@ -907,34 +954,37 @@
         });
         //Saving the order and number of videos for an already saved/loaded playlist without being forced to re-enter the same title.
         loadedPlaylistSave.addEventListener("click",function(){
-          let name = loadedPlaylistTitle.textContent;
-          let zeURLs = [{id:name}];
-          let conCh = controls.children;
-          for (let c of conCh) {
-            zeURLs.push("https://www.youtube.com/watch?v=" + c.firstElementChild.textContent);
-          }
-          let o = localStorage.getItem("master");
-          let p = JSON.parse(o);
-          let secure = [];
-          for (let b = 0; b < p.length; b++) {
-            secure.push(p[b][0].id)
-          }
-          if (secure.every(function(a){return a != name;})) {
-            secure.push(name);
-          }
-          for (let s in secure) {
-            if (secure[s] == name) {
-              p[s] = [{id:name}];
-              let conCh2 = controls.children;
-              if (conCh2.length > 0) {
-                for (let c of conCh2) {
-                  p[s].push("https://www.youtube.com/watch?v=" + c.firstElementChild.textContent);
+          if (tracker.length >= 1) {
+            let name = loadedPlaylistTitle.textContent;
+            //Setting the time of the save.
+            let d = new Date();
+            let lastDate = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+            loadedPlaylistUpdate.textContent = lastDate;
+            let o = localStorage.getItem("master");
+            let p = JSON.parse(o);
+            for (let playlist in p) {
+              if (p[playlist][0].id == nameMaster) {
+                nameMaster = name;
+                let tempPlaylist = [{id:name},{update:lastDate}];
+                let conCh2 = controls.children;
+                if (conCh2.length > 0) {
+                  for (let c of conCh2) {
+                    tempPlaylist.push("https://www.youtube.com/watch?v=" + c.firstElementChild.textContent);
+                  }
                 }
+                p[playlist] = tempPlaylist;
               }
-              localStorage.setItem("master",JSON.stringify(p));
             }
+            localStorage.setItem("master",JSON.stringify(p));
           }
         });
+        //Ensuring that edits/changes to the loaded playlist title meet certain minimum requirements.
+        loadedPlaylistTitle.addEventListener("focusout",function(){
+          let text = this.textContent;
+          if (text.length < 1) {
+            this.textContent = nameMaster;
+          }
+        })
         //Changing the lightness/darkness of the widget's primary CSS properties.
         lightDarkSlider.addEventListener("input",function(){
           let v = this.value;
